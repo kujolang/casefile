@@ -1,0 +1,3 @@
+# CaseFile Kujo module scaffold: configuration loading and validation.
+# Main implementation currently lives in casefile.kujo while module import support
+# is stabilized for this repository runtime path.

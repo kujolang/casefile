@@ -1,0 +1,9 @@
+/target
+.casefile/
+*.swp
+*.swo
+*~
+.DS_Store
+agent/
+MEGA_PROMPT.md
+FINAL_REPORT.md
