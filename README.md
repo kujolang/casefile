@@ -26,7 +26,7 @@ Help is available through `help` or `--help`. There is no standalone version com
 ## Quick Start
 
 ```bash
-export KUJO_BIN="/Users/robertdevore/2026/kujo/target/debug/kujo"
+export KUJO_BIN="/path/to/kujo/target/debug/kujo"
 
 # bootstrap
 "$KUJO_BIN" run --interpreter casefile.kujo -- init
@@ -105,7 +105,7 @@ Files are mode-aware and only written when applicable.
 Run the Kujo-native test suite:
 
 ```bash
-export KUJO_BIN="/Users/robertdevore/2026/kujo/target/debug/kujo"
+export KUJO_BIN="/path/to/kujo/target/debug/kujo"
 "$KUJO_BIN" test-run -v tests/casefile_cli_test_v2.kujo
 ```
 

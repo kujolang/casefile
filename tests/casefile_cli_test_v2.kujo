@@ -1,6 +1,7 @@
 test "init creates casefile.toml" {
-	kujo_bin := "/Users/robertdevore/2026/kujo/target/debug/kujo"
-	casefile_script := "/Users/robertdevore/Documents/Kujolang/kujo-repos/casefile/casefile.kujo"
+	kujo_bin_res := spawn_process(["sh", "-lc", "printf '%s' \"$KUJO_BIN\""])
+	kujo_bin := trim(to_string(kujo_bin_res.stdout))
+	casefile_script := path_join(os_getcwd(), "casefile.kujo")
 	ws := "/tmp/casefile-test-init-" + to_string(current_timestamp())
 	spawn_process(["rm", "-rf", ws])
 	spawn_process(["mkdir", "-p", ws])
@@ -15,8 +16,9 @@ test "init creates casefile.toml" {
 }
 
 test "validate passes after init" {
-	kujo_bin := "/Users/robertdevore/2026/kujo/target/debug/kujo"
-	casefile_script := "/Users/robertdevore/Documents/Kujolang/kujo-repos/casefile/casefile.kujo"
+	kujo_bin_res := spawn_process(["sh", "-lc", "printf '%s' \"$KUJO_BIN\""])
+	kujo_bin := trim(to_string(kujo_bin_res.stdout))
+	casefile_script := path_join(os_getcwd(), "casefile.kujo")
 	ws := "/tmp/casefile-test-validate-" + to_string(current_timestamp())
 	spawn_process(["rm", "-rf", ws])
 	spawn_process(["mkdir", "-p", ws])
@@ -32,8 +34,9 @@ test "validate passes after init" {
 }
 
 test "capture accepts absolute output_dir inside repo" {
-	kujo_bin := "/Users/robertdevore/2026/kujo/target/debug/kujo"
-	casefile_script := "/Users/robertdevore/Documents/Kujolang/kujo-repos/casefile/casefile.kujo"
+	kujo_bin_res := spawn_process(["sh", "-lc", "printf '%s' \"$KUJO_BIN\""])
+	kujo_bin := trim(to_string(kujo_bin_res.stdout))
+	casefile_script := path_join(os_getcwd(), "casefile.kujo")
 	ws := "/private/tmp/casefile-test-abs-" + to_string(current_timestamp())
 	custom_root := path_join(ws, "custom-output")
 	spawn_process(["rm", "-rf", ws])
@@ -56,8 +59,9 @@ test "capture accepts absolute output_dir inside repo" {
 }
 
 test "capture rejects prefix-sibling output_dir" {
-	kujo_bin := "/Users/robertdevore/2026/kujo/target/debug/kujo"
-	casefile_script := "/Users/robertdevore/Documents/Kujolang/kujo-repos/casefile/casefile.kujo"
+	kujo_bin_res := spawn_process(["sh", "-lc", "printf '%s' \"$KUJO_BIN\""])
+	kujo_bin := trim(to_string(kujo_bin_res.stdout))
+	casefile_script := path_join(os_getcwd(), "casefile.kujo")
 	ws := "/private/tmp/casefile-test-prefix-" + to_string(current_timestamp())
 	outside_root := ws + "-outside"
 	spawn_process(["rm", "-rf", ws])
@@ -79,8 +83,9 @@ test "capture rejects prefix-sibling output_dir" {
 }
 
 test "validate rejects traversal output_dir" {
-	kujo_bin := "/Users/robertdevore/2026/kujo/target/debug/kujo"
-	casefile_script := "/Users/robertdevore/Documents/Kujolang/kujo-repos/casefile/casefile.kujo"
+	kujo_bin_res := spawn_process(["sh", "-lc", "printf '%s' \"$KUJO_BIN\""])
+	kujo_bin := trim(to_string(kujo_bin_res.stdout))
+	casefile_script := path_join(os_getcwd(), "casefile.kujo")
 	ws := "/tmp/casefile-test-traversal-" + to_string(current_timestamp())
 	spawn_process(["rm", "-rf", ws])
 	spawn_process(["mkdir", "-p", ws])
@@ -99,8 +104,9 @@ test "validate rejects traversal output_dir" {
 }
 
 test "capture command writes case artifacts" {
-	kujo_bin := "/Users/robertdevore/2026/kujo/target/debug/kujo"
-	casefile_script := "/Users/robertdevore/Documents/Kujolang/kujo-repos/casefile/casefile.kujo"
+	kujo_bin_res := spawn_process(["sh", "-lc", "printf '%s' \"$KUJO_BIN\""])
+	kujo_bin := trim(to_string(kujo_bin_res.stdout))
+	casefile_script := path_join(os_getcwd(), "casefile.kujo")
 	ws := "/tmp/casefile-test-capture-" + to_string(current_timestamp())
 	spawn_process(["rm", "-rf", ws])
 	spawn_process(["mkdir", "-p", ws])
@@ -132,8 +138,9 @@ test "capture command writes case artifacts" {
 }
 
 test "mirror exit code returns failing command status" {
-	kujo_bin := "/Users/robertdevore/2026/kujo/target/debug/kujo"
-	casefile_script := "/Users/robertdevore/Documents/Kujolang/kujo-repos/casefile/casefile.kujo"
+	kujo_bin_res := spawn_process(["sh", "-lc", "printf '%s' \"$KUJO_BIN\""])
+	kujo_bin := trim(to_string(kujo_bin_res.stdout))
+	casefile_script := path_join(os_getcwd(), "casefile.kujo")
 	ws := "/tmp/casefile-test-mirror-" + to_string(current_timestamp())
 	spawn_process(["rm", "-rf", ws])
 	spawn_process(["mkdir", "-p", ws])
@@ -148,8 +155,9 @@ test "mirror exit code returns failing command status" {
 }
 
 test "list and show latest commands work" {
-	kujo_bin := "/Users/robertdevore/2026/kujo/target/debug/kujo"
-	casefile_script := "/Users/robertdevore/Documents/Kujolang/kujo-repos/casefile/casefile.kujo"
+	kujo_bin_res := spawn_process(["sh", "-lc", "printf '%s' \"$KUJO_BIN\""])
+	kujo_bin := trim(to_string(kujo_bin_res.stdout))
+	casefile_script := path_join(os_getcwd(), "casefile.kujo")
 	ws := "/tmp/casefile-test-listshow-" + to_string(current_timestamp())
 	spawn_process(["rm", "-rf", ws])
 	spawn_process(["mkdir", "-p", ws])
@@ -170,8 +178,9 @@ test "list and show latest commands work" {
 }
 
 test "clean dry-run reports deletions" {
-	kujo_bin := "/Users/robertdevore/2026/kujo/target/debug/kujo"
-	casefile_script := "/Users/robertdevore/Documents/Kujolang/kujo-repos/casefile/casefile.kujo"
+	kujo_bin_res := spawn_process(["sh", "-lc", "printf '%s' \"$KUJO_BIN\""])
+	kujo_bin := trim(to_string(kujo_bin_res.stdout))
+	casefile_script := path_join(os_getcwd(), "casefile.kujo")
 	ws := "/tmp/casefile-test-clean-" + to_string(current_timestamp())
 	spawn_process(["rm", "-rf", ws])
 	spawn_process(["mkdir", "-p", ws])

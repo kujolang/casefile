@@ -15,7 +15,7 @@ CaseFile is maintained as a Kujo-native project with deterministic, local-first 
 Primary runtime used in this repository:
 
 ```bash
-/Users/robertdevore/2026/kujo/target/debug/kujo
+/path/to/kujo/target/debug/kujo
 ```
 
 Primary script:
@@ -28,14 +28,14 @@ casefile.kujo
 
 ```bash
 # Usage and command surface
-/Users/robertdevore/2026/kujo/target/debug/kujo run --interpreter casefile.kujo -- help
+/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- help
 
 # Config lifecycle
-/Users/robertdevore/2026/kujo/target/debug/kujo run --interpreter casefile.kujo -- init
-/Users/robertdevore/2026/kujo/target/debug/kujo run --interpreter casefile.kujo -- validate
+/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- init
+/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- validate
 
 # Tests
-/Users/robertdevore/2026/kujo/target/debug/kujo test-run -v tests/casefile_cli_test_v2.kujo
+/path/to/kujo/target/debug/kujo test-run -v tests/casefile_cli_test_v2.kujo
 ```
 
 ## Pull Request Expectations

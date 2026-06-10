@@ -7,9 +7,9 @@ Use `help` or `--help` to inspect the command surface. There is no standalone ve
 ## 1. Bootstrap a New Repository
 
 ```bash
-/Users/robertdevore/2026/kujo/target/debug/kujo run --interpreter casefile.kujo -- init
-/Users/robertdevore/2026/kujo/target/debug/kujo run --interpreter casefile.kujo -- validate
-/Users/robertdevore/2026/kujo/target/debug/kujo run --interpreter casefile.kujo -- doctor
+/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- init
+/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- validate
+/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- doctor
 ```
 
 Expected outcome:
@@ -20,19 +20,19 @@ Expected outcome:
 ## 2. Capture a Failing Command (Primary Workflow)
 
 ```bash
-/Users/robertdevore/2026/kujo/target/debug/kujo run --interpreter casefile.kujo -- capture --name auth-regression -- false
+/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- capture --name auth-regression -- false
 ```
 
 For complex commands, pass argv after `--`.
 
 ```bash
-/Users/robertdevore/2026/kujo/target/debug/kujo run --interpreter casefile.kujo -- capture --name api-test -- npm test -- --runInBand
+/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- capture --name api-test -- npm test -- --runInBand
 ```
 
 ## 3. Preserve Exit Codes in CI
 
 ```bash
-/Users/robertdevore/2026/kujo/target/debug/kujo run --interpreter casefile.kujo -- capture --mirror-exit-code -- false
+/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- capture --mirror-exit-code -- false
 ```
 
 Use this mode when upstream automation must fail if the captured command fails.
@@ -40,7 +40,7 @@ Use this mode when upstream automation must fail if the captured command fails.
 ## 4. Capture from Existing Logs
 
 ```bash
-/Users/robertdevore/2026/kujo/target/debug/kujo run --interpreter casefile.kujo -- capture --from-log /tmp/failed-build.log --name ci-log-capture
+/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- capture --from-log /tmp/failed-build.log --name ci-log-capture
 ```
 
 Best when command rerun is expensive or impossible in current environment.
@@ -48,7 +48,7 @@ Best when command rerun is expensive or impossible in current environment.
 ## 5. Manual Incident Record
 
 ```bash
-/Users/robertdevore/2026/kujo/target/debug/kujo run --interpreter casefile.kujo -- capture --manual --name prod-note --notes "Observed elevated 500 rates after deploy window"
+/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- capture --manual --name prod-note --notes "Observed elevated 500 rates after deploy window"
 ```
 
 Use manual mode for operational notes, postmortem context, or external incident data.
@@ -56,9 +56,9 @@ Use manual mode for operational notes, postmortem context, or external incident 
 ## 6. Review and Handoff
 
 ```bash
-/Users/robertdevore/2026/kujo/target/debug/kujo run --interpreter casefile.kujo -- list
-/Users/robertdevore/2026/kujo/target/debug/kujo run --interpreter casefile.kujo -- show latest --format markdown
-/Users/robertdevore/2026/kujo/target/debug/kujo run --interpreter casefile.kujo -- show latest --format json
+/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- list
+/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- show latest --format markdown
+/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- show latest --format json
 ```
 
 Share these artifacts first:
@@ -71,19 +71,19 @@ Share these artifacts first:
 Preview only:
 
 ```bash
-/Users/robertdevore/2026/kujo/target/debug/kujo run --interpreter casefile.kujo -- clean --keep 20 --dry-run
+/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- clean --keep 20 --dry-run
 ```
 
 Execute retention:
 
 ```bash
-/Users/robertdevore/2026/kujo/target/debug/kujo run --interpreter casefile.kujo -- clean --keep 20
+/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- clean --keep 20
 ```
 
 Age-based cleanup:
 
 ```bash
-/Users/robertdevore/2026/kujo/target/debug/kujo run --interpreter casefile.kujo -- clean --older-than 30d --dry-run
+/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- clean --older-than 30d --dry-run
 ```
 
 ## 8. Troubleshooting

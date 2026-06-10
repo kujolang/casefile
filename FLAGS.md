@@ -5,7 +5,7 @@ This file is the authoritative command and flag surface for CaseFile v0.1.x.
 ## Invocation Pattern
 
 ```bash
-/Users/robertdevore/2026/kujo/target/debug/kujo run --interpreter casefile.kujo -- <command> [flags] [-- command argv...]
+/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- <command> [flags] [-- command argv...]
 ```
 
 ## Global
