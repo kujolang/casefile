@@ -1,6 +1,6 @@
 # CaseFile Flag Reference
 
-This file is the authoritative command and flag surface for CaseFile v0.1.x.
+This file is the authoritative command and flag surface for CaseFile v1.0.0.
 
 ## Invocation Pattern
 
