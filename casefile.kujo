@@ -1515,25 +1515,25 @@ func doctor_command_handler() {
 }
 
 func sort_case_ids(values) {
-	items := clone_array(values)
-	n := len(items)
+	sorted_ids := clone_array(values)
+	n := len(sorted_ids)
 	if n <= 1 {
-		return items
+		return sorted_ids
 	}
 	i := 0
 	while i < n {
 		j := 0
 		while j < n - i - 1 {
-			if items[j] > items[j + 1] {
-				tmp := items[j]
-				items[j] = items[j + 1]
-				items[j + 1] = tmp
+			if sorted_ids[j] > sorted_ids[j + 1] {
+				tmp := sorted_ids[j]
+				sorted_ids[j] = sorted_ids[j + 1]
+				sorted_ids[j + 1] = tmp
 			}
 			j = j + 1
 		}
 		i = i + 1
 	}
-	return items
+	return sorted_ids
 }
 
 func list_case_dirs(output_root) {
