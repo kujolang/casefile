@@ -1,3 +1,28 @@
+test "help output is byte stable" {
+	kujo_bin_res := spawn_process(["sh", "-lc", "printf '%s' \"$KUJO_BIN\""])
+	kujo_bin := trim(to_string(kujo_bin_res.stdout))
+	casefile_script := path_join(os_getcwd(), "casefile.kujo")
+
+	res := spawn_process([kujo_bin, "run", "--interpreter", casefile_script, "--", "help"])
+
+	expected := "CaseFile 1.0.0\n"
+		+ "\n"
+		+ "Usage:\n"
+		+ "  kujo run casefile.kujo -- <command> [options]\n"
+		+ "\n"
+		+ "Commands:\n"
+		+ "  capture   Capture a command failure, log file, or manual case\n"
+		+ "  init      Create default casefile.toml\n"
+		+ "  validate  Validate casefile.toml\n"
+		+ "  doctor    Print diagnostics\n"
+		+ "  list      List existing cases\n"
+		+ "  show      Show case summary\n"
+		+ "  clean     Clean old cases\n"
+
+	assert_equal(to_int(res.exitcode), 0)
+	assert_equal(to_string(res.stdout), expected)
+}
+
 test "init creates casefile.toml" {
 	kujo_bin_res := spawn_process(["sh", "-lc", "printf '%s' \"$KUJO_BIN\""])
 	kujo_bin := trim(to_string(kujo_bin_res.stdout))
