@@ -4,8 +4,10 @@ This file is the authoritative command and flag surface for CaseFile v1.0.0.
 
 ## Invocation Pattern
 
+Examples assume `KUJO_BIN` points to the local Kujo executable.
+
 ```bash
-/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- <command> [flags] [-- command argv...]
+"$KUJO_BIN" run --interpreter casefile.kujo -- <command> [flags] [-- command argv...]
 ```
 
 ## Global

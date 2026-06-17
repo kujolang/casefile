@@ -4,12 +4,18 @@ This runbook provides operational workflows for common incident capture and tria
 
 Use `help` or `--help` to inspect the command surface. There is no standalone version command; `--version` is unsupported and exits `2`.
 
+Set the Kujo binary once before running the workflows below:
+
+```bash
+export KUJO_BIN="/path/to/kujo/target/debug/kujo"
+```
+
 ## 1. Bootstrap a New Repository
 
 ```bash
-/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- init
-/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- validate
-/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- doctor
+"$KUJO_BIN" run --interpreter casefile.kujo -- init
+"$KUJO_BIN" run --interpreter casefile.kujo -- validate
+"$KUJO_BIN" run --interpreter casefile.kujo -- doctor
 ```
 
 Expected outcome:
@@ -20,19 +26,19 @@ Expected outcome:
 ## 2. Capture a Failing Command (Primary Workflow)
 
 ```bash
-/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- capture --name auth-regression -- false
+"$KUJO_BIN" run --interpreter casefile.kujo -- capture --name auth-regression -- false
 ```
 
 For complex commands, pass argv after `--`.
 
 ```bash
-/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- capture --name api-test -- npm test -- --runInBand
+"$KUJO_BIN" run --interpreter casefile.kujo -- capture --name api-test -- npm test -- --runInBand
 ```
 
 ## 3. Preserve Exit Codes in CI
 
 ```bash
-/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- capture --mirror-exit-code -- false
+"$KUJO_BIN" run --interpreter casefile.kujo -- capture --mirror-exit-code -- false
 ```
 
 Use this mode when upstream automation must fail if the captured command fails.
@@ -40,7 +46,7 @@ Use this mode when upstream automation must fail if the captured command fails.
 ## 4. Capture from Existing Logs
 
 ```bash
-/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- capture --from-log /tmp/failed-build.log --name ci-log-capture
+"$KUJO_BIN" run --interpreter casefile.kujo -- capture --from-log /tmp/failed-build.log --name ci-log-capture
 ```
 
 Best when command rerun is expensive or impossible in current environment.
@@ -48,7 +54,7 @@ Best when command rerun is expensive or impossible in current environment.
 ## 5. Manual Incident Record
 
 ```bash
-/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- capture --manual --name prod-note --notes "Observed elevated 500 rates after deploy window"
+"$KUJO_BIN" run --interpreter casefile.kujo -- capture --manual --name prod-note --notes "Observed elevated 500 rates after deploy window"
 ```
 
 Use manual mode for operational notes, postmortem context, or external incident data.
@@ -56,9 +62,9 @@ Use manual mode for operational notes, postmortem context, or external incident 
 ## 6. Review and Handoff
 
 ```bash
-/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- list
-/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- show latest --format markdown
-/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- show latest --format json
+"$KUJO_BIN" run --interpreter casefile.kujo -- list
+"$KUJO_BIN" run --interpreter casefile.kujo -- show latest --format markdown
+"$KUJO_BIN" run --interpreter casefile.kujo -- show latest --format json
 ```
 
 Share these artifacts first:
@@ -71,19 +77,19 @@ Share these artifacts first:
 Preview only:
 
 ```bash
-/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- clean --keep 20 --dry-run
+"$KUJO_BIN" run --interpreter casefile.kujo -- clean --keep 20 --dry-run
 ```
 
 Execute retention:
 
 ```bash
-/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- clean --keep 20
+"$KUJO_BIN" run --interpreter casefile.kujo -- clean --keep 20
 ```
 
 Age-based cleanup:
 
 ```bash
-/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- clean --older-than 30d --dry-run
+"$KUJO_BIN" run --interpreter casefile.kujo -- clean --older-than 30d --dry-run
 ```
 
 ## 8. Troubleshooting

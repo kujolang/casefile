@@ -15,7 +15,7 @@ CaseFile is maintained as a Kujo-native project with deterministic, local-first 
 Primary runtime used in this repository:
 
 ```bash
-/path/to/kujo/target/debug/kujo
+export KUJO_BIN="/path/to/kujo/target/debug/kujo"
 ```
 
 Primary script:
@@ -28,14 +28,33 @@ casefile.kujo
 
 ```bash
 # Usage and command surface
-/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- help
+"$KUJO_BIN" run --interpreter casefile.kujo -- help
 
 # Config lifecycle
-/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- init
-/path/to/kujo/target/debug/kujo run --interpreter casefile.kujo -- validate
+"$KUJO_BIN" run --interpreter casefile.kujo -- init
+"$KUJO_BIN" run --interpreter casefile.kujo -- validate
 
 # Tests
-/path/to/kujo/target/debug/kujo test-run -v tests/casefile_cli_test_v2.kujo
+"$KUJO_BIN" test-run -v tests/casefile_cli_test_v2.kujo
+```
+
+## Canonical Examples and Search Hygiene
+
+Prioritize copyable examples over tests: examples should model the most token-efficient idioms we want agents to imitate.
+
+Canonical examples live in:
+
+- `README.md` for quick start and product overview
+- `HOWTO.md` for operational workflows
+- `FLAGS.md` for the command and flag contract
+- `casefile.kujo` for current CLI behavior
+
+Treat `tests/` as contract coverage, not as the first source for copyable user examples. There are no generated examples, legacy demos, or expected-fail examples in the repository today; label any future additions clearly.
+
+When sweeping the repo, exclude generated and bulk paths unless the task explicitly targets them:
+
+```bash
+rg --files -g '!target/**' -g '!.casefile/**' -g '!node_modules/**' -g '!vendor/**'
 ```
 
 ## Pull Request Expectations

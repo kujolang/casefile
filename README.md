@@ -40,6 +40,13 @@ export KUJO_BIN="/path/to/kujo/target/debug/kujo"
 "$KUJO_BIN" run --interpreter casefile.kujo -- show latest --format markdown
 ```
 
+Expected bootstrap output includes:
+
+```text
+Created casefile.toml
+Config validation passed
+```
+
 ## Commands
 
 | Command | Purpose |
@@ -78,17 +85,20 @@ Default output root: `.casefile/`
 
 Each case directory uses this shape:
 
-- `.casefile/<YYYY-MM-DD-HHMMSS-name>/case.md`
-- `.casefile/<YYYY-MM-DD-HHMMSS-name>/case.json`
-- `.casefile/<YYYY-MM-DD-HHMMSS-name>/command.txt`
-- `.casefile/<YYYY-MM-DD-HHMMSS-name>/stdout.log`
-- `.casefile/<YYYY-MM-DD-HHMMSS-name>/stderr.log`
-- `.casefile/<YYYY-MM-DD-HHMMSS-name>/combined.log`
-- `.casefile/<YYYY-MM-DD-HHMMSS-name>/git-status.txt`
-- `.casefile/<YYYY-MM-DD-HHMMSS-name>/git-diff-stat.txt`
-- `.casefile/<YYYY-MM-DD-HHMMSS-name>/environment.json`
-- `.casefile/<YYYY-MM-DD-HHMMSS-name>/reproduction.md`
-- `.casefile/<YYYY-MM-DD-HHMMSS-name>/handoff.md`
+```text
+.casefile/<YYYY-MM-DD-HHMMSS-name>/
+  case.md
+  case.json
+  command.txt
+  stdout.log
+  stderr.log
+  combined.log
+  git-status.txt
+  git-diff-stat.txt
+  environment.json
+  reproduction.md
+  handoff.md
+```
 
 Files are mode-aware and only written when applicable.
 

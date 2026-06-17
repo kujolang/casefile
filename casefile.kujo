@@ -58,6 +58,26 @@ func safe_to_string(value) {
 	}
 }
 
+func print_lines(lines) {
+	for line in lines {
+		print(line)
+	}
+}
+
+func print_kv_lines(prefix, pairs) {
+	for pair in pairs {
+		print(prefix + safe_to_string(pair[0]) + ": " + safe_to_string(pair[1]))
+	}
+}
+
+func print_capture_error(message) {
+	print("capture error: " + safe_to_string(message))
+}
+
+func print_validation_error(message) {
+	print("Validation failed: " + safe_to_string(message))
+}
+
 func is_truthy(value) {
 	value_type := type(value)
 	if value_type == "bool" {
@@ -1303,41 +1323,56 @@ func build_case_json(version, case_id, case_path, options, capture_data, git_ctx
 }
 
 func output_capture_summary(case_id, case_path, capture_data, classification) {
-	print("CaseFile captured failure")
-	print("")
-	print("Case: " + safe_to_string(case_id))
-	print("Path: " + safe_to_string(case_path))
-	print("Command: " + safe_to_string(capture_data["display"]))
-	print("Exit code: " + safe_to_string(capture_data["exit_code"]))
-	print("Severity: " + safe_to_string(classification["severity"]))
-	print("")
-	print("Artifacts:")
-	print("- case.md")
-	print("- case.json")
-	print("- combined.log")
-	print("- reproduction.md")
-	print("- handoff.md")
-	print("")
-	print("Next:")
-	print("1. Open " + path_join(safe_to_string(case_path), "case.md"))
-	print("2. Re-run: " + safe_to_string(capture_data["display"]))
-	print("3. Send handoff.md to the next reviewer or agent")
+	print_lines([
+		"CaseFile captured failure",
+		""
+	])
+	print_kv_lines("", [
+		["Case", case_id],
+		["Path", case_path],
+		["Command", capture_data["display"]],
+		["Exit code", capture_data["exit_code"]],
+		["Severity", classification["severity"]]
+	])
+	print_lines([
+		"",
+		"Artifacts:"
+	])
+	for artifact in ["case.md", "case.json", "combined.log", "reproduction.md", "handoff.md"] {
+		print("- " + artifact)
+	}
+	print_lines([
+		"",
+		"Next:"
+	])
+	steps := [
+		"Open " + path_join(safe_to_string(case_path), "case.md"),
+		"Re-run: " + safe_to_string(capture_data["display"]),
+		"Send handoff.md to the next reviewer or agent"
+	]
+	step_no := 1
+	for step in steps {
+		print(to_string(step_no) + ". " + step)
+		step_no = step_no + 1
+	}
 }
 
 func usage() {
-	print("CaseFile " + VERSION)
-	print("")
-	print("Usage:")
-	print("  kujo run casefile.kujo -- <command> [options]")
-	print("")
-	print("Commands:")
-	print("  capture   Capture a command failure, log file, or manual case")
-	print("  init      Create default casefile.toml")
-	print("  validate  Validate casefile.toml")
-	print("  doctor    Print diagnostics")
-	print("  list      List existing cases")
-	print("  show      Show case summary")
-	print("  clean     Clean old cases")
+	print_lines([
+		"CaseFile " + VERSION,
+		"",
+		"Usage:",
+		"  kujo run casefile.kujo -- <command> [options]",
+		"",
+		"Commands:",
+		"  capture   Capture a command failure, log file, or manual case",
+		"  init      Create default casefile.toml",
+		"  validate  Validate casefile.toml",
+		"  doctor    Print diagnostics",
+		"  list      List existing cases",
+		"  show      Show case summary",
+		"  clean     Clean old cases"
+	])
 }
 
 func capture_command_handler(subargs) {
@@ -1350,7 +1385,7 @@ func capture_command_handler(subargs) {
 
 	parsed_result := parse_capture_options(subargs, cfg)
 	if !parsed_result["ok"] {
-			print("capture error: " + safe_to_string(parsed_result["error"]))
+		print_capture_error(parsed_result["error"])
 		exit(parsed_result["code"])
 	}
 	options := parsed_result["options"]
@@ -1368,7 +1403,7 @@ func capture_command_handler(subargs) {
 
 	case_result := create_case_dir(repo_root, cfg, case_name, options["force"])
 	if !case_result["ok"] {
-			print("capture error: " + safe_to_string(case_result["error"]))
+		print_capture_error(case_result["error"])
 		exit(4)
 	}
 	case_id := case_result["case_id"]
@@ -1394,7 +1429,7 @@ func capture_command_handler(subargs) {
 	}
 
 	if !capture_result["ok"] {
-			print("capture error: " + safe_to_string(capture_result["error"]))
+		print_capture_error(capture_result["error"])
 		exit(4)
 	}
 
@@ -1450,21 +1485,23 @@ func validate_command_handler() {
 	repo_root := get_repo_root()
 	output_check := resolve_output_dir(repo_root, safe_to_string(cfg["output_dir"]))
 	if !output_check["ok"] {
-		print("Validation failed: " + safe_to_string(output_check["error"]))
+		print_validation_error(output_check["error"])
 		exit(2)
 	}
 	if parse_int_value(cfg["max_log_bytes"], -1) < 0 {
-		print("Validation failed: max_log_bytes must be non-negative")
+		print_validation_error("max_log_bytes must be non-negative")
 		exit(2)
 	}
 	fmt := to_lower(safe_to_string(cfg["default_format"]))
 	if fmt != "human" && fmt != "markdown" && fmt != "json" {
-		print("Validation failed: default_format must be human|markdown|json")
+		print_validation_error("default_format must be human|markdown|json")
 		exit(2)
 	}
-	print("Config validation passed")
-	print("- Repo root: " + safe_to_string(repo_root))
-	print("- Output dir: " + safe_to_string(output_check["path"]))
+	print_lines(["Config validation passed"])
+	print_kv_lines("- ", [
+		["Repo root", repo_root],
+		["Output dir", output_check["path"]]
+	])
 	exit(0)
 }
 
@@ -1486,27 +1523,31 @@ func doctor_command_handler() {
 		writable = mk["ok"]
 	}
 
-	print("CaseFile doctor")
-	print("")
-	print("- Version: " + VERSION)
-	print("- CWD: " + safe_to_string(env_data["cwd"]))
-	print("- Repo root: " + safe_to_string(repo_root))
-	print("- Inside git repo: " + safe_to_string(git_ctx["is_git_repo"]))
-	print("- Git branch: " + safe_to_string(git_ctx["branch"]))
-	print("- Config detected: " + safe_to_string(is_truthy(file_exists("casefile.toml"))))
-	print("- Config parse ok: " + safe_to_string(cfg_ok))
-	print("- Output directory: " + safe_to_string(output_check["path"]))
-	print("- Output writable: " + safe_to_string(writable))
-	print("- Package manager: " + safe_to_string(env_data["package_manager"]))
-	print("- Node: " + safe_to_string(env_data["node"]))
-	print("- npm: " + safe_to_string(env_data["npm"]))
-	print("- pnpm: " + safe_to_string(env_data["pnpm"]))
-	print("- yarn: " + safe_to_string(env_data["yarn"]))
-	print("- Python: " + safe_to_string(env_data["python"]))
-	print("- pytest: " + safe_to_string(env_data["pytest"]))
-	print("- PHP: " + safe_to_string(env_data["php"]))
-	print("- composer: " + safe_to_string(env_data["composer"]))
-	print("- Go: " + safe_to_string(env_data["go"]))
+	print_lines([
+		"CaseFile doctor",
+		""
+	])
+	print_kv_lines("- ", [
+		["Version", VERSION],
+		["CWD", env_data["cwd"]],
+		["Repo root", repo_root],
+		["Inside git repo", git_ctx["is_git_repo"]],
+		["Git branch", git_ctx["branch"]],
+		["Config detected", is_truthy(file_exists("casefile.toml"))],
+		["Config parse ok", cfg_ok],
+		["Output directory", output_check["path"]],
+		["Output writable", writable],
+		["Package manager", env_data["package_manager"]],
+		["Node", env_data["node"]],
+		["npm", env_data["npm"]],
+		["pnpm", env_data["pnpm"]],
+		["yarn", env_data["yarn"]],
+		["Python", env_data["python"]],
+		["pytest", env_data["pytest"]],
+		["PHP", env_data["php"]],
+		["composer", env_data["composer"]],
+		["Go", env_data["go"]]
+	])
 
 	if !cfg_ok {
 		print("Warning: configuration file exists but could not be parsed")
@@ -1585,8 +1626,10 @@ func list_command_handler() {
 		exit(0)
 	}
 
-	print("Case ID | Name | Exit | Severity | Path")
-	print("----------------------------------------")
+	print_lines([
+		"Case ID | Name | Exit | Severity | Path",
+		"----------------------------------------"
+	])
 	for case_id in case_dirs {
 		case_path := path_join(output_root, case_id)
 		case_json := read_case_json(case_path)
