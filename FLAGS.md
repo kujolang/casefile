@@ -133,3 +133,5 @@ Lists known cases in table format.
 
 - Prefer `-- <argv...>` for reliable command parsing.
 - `--include`, `--exclude`, and `--force` are accepted today and reserved for expanded behavior.
+- Redaction applies to generated logs, command metadata, report notes, and rendered handoff artifacts unless `--no-redact` is set.
+- `case.json` includes `security.redaction_enabled` and `security.redaction_count` for automation checks.

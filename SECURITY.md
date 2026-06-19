@@ -15,7 +15,7 @@ CaseFile is a local incident-capture CLI focused on deterministic artifact gener
 
 ### 1) Redaction by Default
 
-CaseFile redacts common secret-like patterns in generated logs and reports.
+CaseFile redacts common secret-like patterns in generated logs, reports, command metadata, and notes.
 
 Typical categories:
 - API keys
@@ -23,6 +23,8 @@ Typical categories:
 - password-like assignments
 - authorization headers
 - private key markers
+
+Redaction is applied before writing generated artifacts such as `case.md`, `case.json`, `command.txt`, `combined.log`, `reproduction.md`, and `handoff.md`. `case.json` includes a `security.redaction_enabled` boolean and `security.redaction_count` counter so automation can verify whether redaction was active and whether any patterns matched.
 
 `--no-redact` is explicit and should only be used in trusted workflows.
 
@@ -47,6 +49,7 @@ Case packets include command metadata, environment context, and git context to i
 - Redaction is pattern-based, not a full DLP/secret-scanning engine.
 - Sensitive command output may transiently exist in process memory before write.
 - Artifacts are plaintext at rest; apply host-level controls as required.
+- Shell snippets are redacted conservatively when they contain embedded assignment-like secret patterns; this may reduce reproduction command fidelity in exchange for safer handoff artifacts.
 
 ## Recommended Hardening
 

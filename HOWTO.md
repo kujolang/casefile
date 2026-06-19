@@ -103,6 +103,7 @@ Age-based cleanup:
 
 Before sharing an incident packet:
 - Confirm redaction status is appropriate
+- Check `case.json` for `security.redaction_enabled` and `security.redaction_count`
 - Verify included notes are accurate and non-sensitive
 - Confirm case reflects reproducible command or clear manual/log context
 - Attach both markdown and JSON outputs for mixed consumer workflows

@@ -10,7 +10,7 @@ It converts failed commands, imported logs, or manual incident notes into reprod
 - [Operator Runbook](HOWTO.md)
 - [Contributing Guide](CONTRIBUTING.md)
 - [Security Policy](SECURITY.md)
-- [Operational Verification Report](FINAL_REPORT.md)
+- [Next Session Review](NEXT_SESSION_REVIEW.md)
 
 ## Runtime Contract
 
@@ -22,6 +22,16 @@ It converts failed commands, imported logs, or manual incident notes into reprod
 Interpreter mode is the documented default path for this repository context.
 
 Help is available through `help` or `--help`. There is no standalone version command; `--version` is unsupported and exits `2`.
+
+## Production Readiness Posture
+
+CaseFile is a strong local-first v1 CLI for deterministic evidence capture, review, and handoff. It is suitable for developer workstations and CI-style local capture flows where plaintext artifacts are acceptable inside a controlled repository workspace.
+
+It should not be described as universally enterprise grade yet. The remaining enterprise hardening work is around encrypted artifact storage, richer retention policy controls, shell-accurate command rendering, configurable timeout enforcement, and broader compatibility proof across large case directories and operating systems. The current next-step list is tracked in [NEXT_SESSION_REVIEW.md](NEXT_SESSION_REVIEW.md).
+
+## Repository Layout
+
+`casefile.kujo` is the active CLI entry point and implementation file. The tracked `src/` files are module scaffolds kept for the planned source split once Kujo module import behavior is stable for this repository runtime path; they are not stale duplicates of migrated code.
 
 ## Quick Start
 
@@ -106,9 +116,13 @@ Files are mode-aware and only written when applicable.
 
 - Deterministic local execution (no network dependency)
 - Redaction enabled by default
+- Command arguments, embedded command snippets, imported logs, and notes are redacted before being written to generated artifacts
+- `case.json` includes a `security` block with redaction status and count metadata
+- Required artifact writes fail the capture instead of silently producing incomplete bundles
 - Path safety checks for output writes and cleanup operations
 - Structured machine-readable `case.json` output for automation
 - Stable handoff artifacts for human or agent workflows
+- Native case-id sorting for list/show/clean scans
 
 ## Validation
 
