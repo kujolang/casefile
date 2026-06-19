@@ -3,18 +3,17 @@
 VERSION := "1.0.0"
 
 DEFAULT_REDACTION_PATTERNS := [
+	"(?i)(api[_-]?key|secret|token|password|private[_-]?key)\\s*[:=]\\s*[^\\s]+",
+	"(?i)Authorization\\s*:\\s*(Bearer\\s+)?[^\\s]+",
+	"(?i)Bearer\\s+[A-Za-z0-9._~+/-]+=*",
+	"AKIA[0-9A-Z]{16}",
+	"-----BEGIN [A-Z ]*PRIVATE KEY-----",
 	"api[_-]?key",
 	"secret",
 	"token",
 	"password",
 	"private[_-]?key",
-	"authorization",
-	"OPENAI_API_KEY\\s*=\\s*[^\\s]+",
-	"(?i)Authorization\\s*:\\s*Bearer\\s+[^\\s]+",
-	"(?i)password\\s*=\\s*[^\\s]+",
-	"(?i)token\\s*=\\s*[^\\s]+",
-	"AKIA[0-9A-Z]{16}",
-	"-----BEGIN [A-Z ]*PRIVATE KEY-----"
+	"authorization"
 ]
 
 FAILURE_KEYWORDS := [
@@ -481,6 +480,16 @@ func safe_write(path_value, content) {
 	}
 }
 
+func require_writes(file_pairs) {
+	for pair in file_pairs {
+		write_result := safe_write(pair[0], pair[1])
+		if !write_result["ok"] {
+			return write_result
+		}
+	}
+	return {"ok": true}
+}
+
 func now_case_stamp() {
 	probe := safe_spawn(["date", "+%Y-%m-%d-%H%M%S"])
 	if proc_success(probe) && proc_exitcode(probe) == 0 {
@@ -714,6 +723,9 @@ func detect_command_version(argv) {
 		lines_out := split(output, "\n")
 		return trim(lines_out[0])
 	}
+	if proc_exitcode(result) == 127 {
+		return null
+	}
 	output_err := trim(proc_stderr(result))
 	if len(output_err) > 0 {
 		lines_err := split(output_err, "\n")
@@ -926,6 +938,113 @@ func redact_text(input_text, enabled, patterns) {
 	return {"text": result, "count": redacted_count}
 }
 
+func is_sensitive_arg_name(value) {
+	arg := to_lower(trim(safe_to_string(value)))
+	while starts_with(arg, "-") {
+		arg = substring(arg, 1, len(arg))
+	}
+	arg = replace(arg, "_", "-")
+	if arg == "p" || arg == "password" || arg == "passwd" || arg == "pwd" {
+		return true
+	}
+	if arg == "token" || arg == "access-token" || arg == "refresh-token" || arg == "bearer-token" {
+		return true
+	}
+	if arg == "secret" || arg == "client-secret" || arg == "api-secret" {
+		return true
+	}
+	if arg == "api-key" || arg == "apikey" || arg == "key" {
+		return true
+	}
+	if arg == "authorization" || arg == "auth-token" {
+		return true
+	}
+	return false
+}
+
+func redact_embedded_arg_secrets(value, enabled) {
+	if !enabled {
+		return {"text": safe_to_string(value), "count": 0}
+	}
+	result := safe_to_string(value)
+	redacted_count := 0
+	patterns := [
+		"api[_-]?key\\s*[:=]\\s*[^\\s'\";]+",
+		"apikey\\s*[:=]\\s*[^\\s'\";]+",
+		"secret\\s*[:=]\\s*[^\\s'\";]+",
+		"token\\s*[:=]\\s*[^\\s'\";]+",
+		"password\\s*[:=]\\s*[^\\s'\";]+",
+		"passwd\\s*[:=]\\s*[^\\s'\";]+",
+		"pwd\\s*[:=]\\s*[^\\s'\";]+",
+		"private[_-]?key\\s*[:=]\\s*[^\\s'\";]+",
+		"Authorization\\s*:\\s*(Bearer\\s+)?[^\\s'\";]+",
+		"authorization\\s*:\\s*(Bearer\\s+)?[^\\s'\";]+"
+	]
+	for pattern in patterns {
+		before := result
+		try {
+			result = regex_replace(result, pattern, "[REDACTED]")
+		} except err {
+		}
+		if before != result {
+			redacted_count = redacted_count + 1
+		}
+	}
+	return {"text": result, "count": redacted_count}
+}
+
+func redact_argv(argv, enabled, patterns) {
+	redacted := []
+	redaction_count := 0
+	redact_next := false
+
+	for arg_value in argv {
+		arg := safe_to_string(arg_value)
+		rendered := arg
+
+		if enabled && redact_next {
+			rendered = "[REDACTED]"
+			redaction_count = redaction_count + 1
+			redact_next = false
+			redacted = push(redacted, rendered)
+			continue
+		}
+
+		if enabled {
+			if is_sensitive_arg_name(arg) && index_of(arg, "=") < 0 {
+				redact_next = true
+				redacted = push(redacted, rendered)
+				continue
+			}
+
+			eq_index := index_of(arg, "=")
+			if eq_index > 0 {
+				key_part := substring(arg, 0, eq_index)
+				if is_sensitive_arg_name(key_part) {
+					rendered = key_part + "=[REDACTED]"
+					redaction_count = redaction_count + 1
+				}
+			}
+
+			if rendered == arg {
+				embedded_redacted := redact_embedded_arg_secrets(arg, enabled)
+				rendered = embedded_redacted["text"]
+				redaction_count = redaction_count + embedded_redacted["count"]
+			}
+
+			if rendered == arg {
+				text_redacted := redact_text(arg, enabled, patterns)
+				rendered = text_redacted["text"]
+				redaction_count = redaction_count + text_redacted["count"]
+			}
+		}
+
+		redacted = push(redacted, rendered)
+	}
+
+	return {"argv": redacted, "display": join(redacted, " "), "count": redaction_count}
+}
+
 func detect_failure_keywords(log_text) {
 	lowered := to_lower(log_text)
 	found := []
@@ -946,6 +1065,17 @@ func capture_command(case_path, options, redact_enabled, patterns) {
 	start := performance_now()
 	proc := safe_spawn_with_options(argv, {"max_output_bytes": options["max_log_bytes"]})
 	duration_ms := to_int(performance_now() - start)
+	command_redacted := redact_argv(argv, redact_enabled, patterns)
+	stored_argv := []
+	command_extra_redactions := 0
+	for stored_arg in command_redacted["argv"] {
+		arg_redacted := redact_embedded_arg_secrets(stored_arg, redact_enabled)
+		stored_argv = push(stored_argv, arg_redacted["text"])
+		command_extra_redactions = command_extra_redactions + arg_redacted["count"]
+	}
+	stored_display_result := redact_embedded_arg_secrets(join(stored_argv, " "), redact_enabled)
+	stored_display := stored_display_result["text"]
+	command_extra_redactions = command_extra_redactions + stored_display_result["count"]
 
 	raw_stdout := safe_to_string(proc_stdout(proc))
 	raw_stderr := safe_to_string(proc_stderr(proc))
@@ -960,16 +1090,21 @@ func capture_command(case_path, options, redact_enabled, patterns) {
 	combined_redacted := redact_text(raw_combined, redact_enabled, patterns)
 	was_truncated := is_truthy(proc_stdout_truncated(proc)) || is_truthy(proc_stderr_truncated(proc))
 
-	safe_write(path_join(case_path, "stdout.log"), stdout_redacted["text"])
-	safe_write(path_join(case_path, "stderr.log"), stderr_redacted["text"])
-	safe_write(path_join(case_path, "combined.log"), combined_redacted["text"])
-	safe_write(path_join(case_path, "command.txt"), join(argv, " "))
+	write_result := require_writes([
+		[path_join(case_path, "stdout.log"), stdout_redacted["text"]],
+		[path_join(case_path, "stderr.log"), stderr_redacted["text"]],
+		[path_join(case_path, "combined.log"), combined_redacted["text"]],
+		[path_join(case_path, "command.txt"), stored_display]
+	])
+	if !write_result["ok"] {
+		return write_result
+	}
 
 	return {
 		"ok": true,
 		"mode": "command",
-		"argv": argv,
-		"display": join(argv, " "),
+		"argv": stored_argv,
+		"display": stored_display,
 		"exit_code": proc_exitcode(proc),
 		"duration_ms": duration_ms,
 		"stdout": stdout_redacted["text"],
@@ -978,7 +1113,8 @@ func capture_command(case_path, options, redact_enabled, patterns) {
 		"truncated": was_truncated,
 		"timed_out": is_truthy(proc_timed_out(proc)),
 		"success": proc_success(proc),
-		"redaction_count": stdout_redacted["count"] + stderr_redacted["count"] + combined_redacted["count"]
+		"redaction_enabled": redact_enabled,
+		"redaction_count": stdout_redacted["count"] + stderr_redacted["count"] + combined_redacted["count"] + command_redacted["count"] + command_extra_redactions
 	}
 }
 
@@ -990,13 +1126,19 @@ func capture_from_log(case_path, log_path, redact_enabled, patterns) {
 	try {
 		raw_log := read_file(log_path)
 		redacted := redact_text(raw_log, redact_enabled, patterns)
-		safe_write(path_join(case_path, "combined.log"), redacted["text"])
-		safe_write(path_join(case_path, "command.txt"), "<from-log> " + log_path)
+		display_redacted := redact_text("<from-log> " + log_path, redact_enabled, patterns)
+		write_result := require_writes([
+			[path_join(case_path, "combined.log"), redacted["text"]],
+			[path_join(case_path, "command.txt"), display_redacted["text"]]
+		])
+		if !write_result["ok"] {
+			return write_result
+		}
 		return {
 			"ok": true,
 			"mode": "log",
 			"argv": [],
-			"display": "<from-log> " + log_path,
+			"display": display_redacted["text"],
 			"exit_code": null,
 			"duration_ms": 0,
 			"stdout": "",
@@ -1005,7 +1147,8 @@ func capture_from_log(case_path, log_path, redact_enabled, patterns) {
 			"truncated": false,
 			"timed_out": false,
 			"success": true,
-			"redaction_count": redacted["count"]
+			"redaction_enabled": redact_enabled,
+			"redaction_count": redacted["count"] + display_redacted["count"]
 		}
 	} except err {
 		return {"ok": false, "error": "failed to read log file: " + safe_to_string(err)}
@@ -1013,7 +1156,10 @@ func capture_from_log(case_path, log_path, redact_enabled, patterns) {
 }
 
 func create_manual_case(case_path) {
-	safe_write(path_join(case_path, "command.txt"), "<manual>")
+	write_result := safe_write(path_join(case_path, "command.txt"), "<manual>")
+	if !write_result["ok"] {
+		return write_result
+	}
 	return {
 		"ok": true,
 		"mode": "manual",
@@ -1027,6 +1173,7 @@ func create_manual_case(case_path) {
 		"truncated": false,
 		"timed_out": false,
 		"success": true,
+		"redaction_enabled": false,
 		"redaction_count": 0
 	}
 }
@@ -1317,6 +1464,10 @@ func build_case_json(version, case_id, case_path, options, capture_data, git_ctx
 			"combined": "combined.log",
 			"truncated": capture_data["truncated"]
 		},
+		"security": {
+			"redaction_enabled": capture_data["redaction_enabled"],
+			"redaction_count": capture_data["redaction_count"]
+		},
 		"classification": classification,
 		"recommendations": recommendations
 	}
@@ -1414,10 +1565,16 @@ func capture_command_handler(subargs) {
 	write_git_files(case_path, git_ctx)
 
 	env_data := detect_environment(repo_root)
-	safe_write(path_join(case_path, "environment.json"), to_json_pretty(env_data))
+	env_write := safe_write(path_join(case_path, "environment.json"), to_json_pretty(env_data))
+	if !env_write["ok"] {
+		print_capture_error(env_write["error"])
+		exit(4)
+	}
 
 	patterns := get_redaction_patterns(cfg)
 	redact_enabled := is_truthy(cfg["redact"]) && !options["no_redact"]
+	notes_redacted := redact_text(options["notes"], redact_enabled, patterns)
+	options["notes"] = notes_redacted["text"]
 
 	capture_result := null
 	if options["mode"] == "command" {
@@ -1432,6 +1589,8 @@ func capture_command_handler(subargs) {
 		print_capture_error(capture_result["error"])
 		exit(4)
 	}
+	capture_result["redaction_enabled"] = redact_enabled
+	capture_result["redaction_count"] = capture_result["redaction_count"] + notes_redacted["count"]
 
 	classification := classify_case(capture_result, git_ctx, env_data)
 	recommendations := build_recommendations(capture_result, git_ctx, env_data)
@@ -1441,10 +1600,16 @@ func capture_command_handler(subargs) {
 	reproduction_markdown := render_reproduction(capture_result)
 	handoff_markdown := render_handoff(capture_result, classification, git_ctx)
 
-	safe_write(path_join(case_path, "case.md"), case_markdown)
-	safe_write(path_join(case_path, "case.json"), to_json_pretty(case_json_obj))
-	safe_write(path_join(case_path, "reproduction.md"), reproduction_markdown)
-	safe_write(path_join(case_path, "handoff.md"), handoff_markdown)
+	artifact_write := require_writes([
+		[path_join(case_path, "case.md"), case_markdown],
+		[path_join(case_path, "case.json"), to_json_pretty(case_json_obj)],
+		[path_join(case_path, "reproduction.md"), reproduction_markdown],
+		[path_join(case_path, "handoff.md"), handoff_markdown]
+	])
+	if !artifact_write["ok"] {
+		print_capture_error(artifact_write["error"])
+		exit(4)
+	}
 
 	if options["format"] == "json" {
 		print(to_json_pretty(case_json_obj))
@@ -1556,25 +1721,7 @@ func doctor_command_handler() {
 }
 
 func sort_case_ids(values) {
-	sorted_ids := clone_array(values)
-	n := len(sorted_ids)
-	if n <= 1 {
-		return sorted_ids
-	}
-	i := 0
-	while i < n {
-		j := 0
-		while j < n - i - 1 {
-			if sorted_ids[j] > sorted_ids[j + 1] {
-				tmp := sorted_ids[j]
-				sorted_ids[j] = sorted_ids[j + 1]
-				sorted_ids[j + 1] = tmp
-			}
-			j = j + 1
-		}
-		i = i + 1
-	}
-	return sorted_ids
+	return sort(clone_array(values))
 }
 
 func list_case_dirs(output_root) {

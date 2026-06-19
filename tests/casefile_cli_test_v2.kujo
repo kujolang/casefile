@@ -222,3 +222,54 @@ test "clean dry-run reports deletions" {
 	assert_equal(to_int(clean_res.exitcode), 0)
 	assert_true(index_of(to_string(clean_res.stdout), "[dry-run] would delete") >= 0)
 }
+
+test "capture redacts command arguments logs and notes" {
+	kujo_bin_res := spawn_process(["sh", "-lc", "printf '%s' \"$KUJO_BIN\""])
+	kujo_bin := trim(to_string(kujo_bin_res.stdout))
+	casefile_script := path_join(os_getcwd(), "casefile.kujo")
+	ws := "/tmp/casefile-test-redaction-" + to_string(current_timestamp())
+	spawn_process(["rm", "-rf", ws])
+	spawn_process(["mkdir", "-p", ws])
+
+	prev := os_getcwd()
+	os_chdir(ws)
+	spawn_process([kujo_bin, "run", "--interpreter", casefile_script, "--", "init"])
+	res := spawn_process([
+		kujo_bin,
+		"run",
+		"--interpreter",
+		casefile_script,
+		"--",
+		"capture",
+		"--name",
+		"redact",
+		"--notes",
+		"token=note-secret",
+		"--",
+		"sh",
+		"-c",
+		"printf 'password=hunter2\\n'; exit 1",
+		"--token",
+		"command-secret"
+	])
+	os_chdir(prev)
+
+	assert_equal(to_int(res.exitcode), 0)
+	case_root := path_join(ws, ".casefile")
+	entries := list_dir(case_root)
+	assert_true(len(entries) > 0)
+	case_dir := path_join(case_root, entries[0])
+
+	case_md := read_file(path_join(case_dir, "case.md"))
+	case_json := parse_json(read_file(path_join(case_dir, "case.json")))
+	command_txt := read_file(path_join(case_dir, "command.txt"))
+	combined_log := read_file(path_join(case_dir, "combined.log"))
+
+	all_text := case_md + "\n" + command_txt + "\n" + combined_log + "\n" + to_json(case_json)
+	assert_true(index_of(all_text, "hunter2") < 0)
+	assert_true(index_of(all_text, "command-secret") < 0)
+	assert_true(index_of(all_text, "note-secret") < 0)
+	assert_true(index_of(all_text, "[REDACTED]") >= 0)
+	assert_true(case_json["security"]["redaction_enabled"])
+	assert_true(case_json["security"]["redaction_count"] > 0)
+}
