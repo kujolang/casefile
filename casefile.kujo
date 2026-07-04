@@ -1794,7 +1794,10 @@ func list_command_handler() {
 				severity = safe_to_string(case_json["classification"]["severity"])
 			}
 		}
-		print(safe_to_string(case_id) + " | " + safe_to_string(name) + " | " + safe_to_string(exit_code) + " | " + safe_to_string(severity) + " | " + safe_to_string(case_path))
+		line := safe_to_string(case_id) + " | " + safe_to_string(name)
+		line = line + " | " + safe_to_string(exit_code) + " | " + safe_to_string(severity)
+		line = line + " | " + safe_to_string(case_path)
+		print(line)
 	}
 	exit(0)
 }
