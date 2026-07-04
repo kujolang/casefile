@@ -1,5 +1,9 @@
 # CaseFile
 
+[![Version](https://img.shields.io/badge/version-1.0.0-black)](https://github.com/kujolang/casefile)
+[![License](https://img.shields.io/badge/license-MIT-lightgrey)](LICENSE)
+[![built with Kujo](https://img.shields.io/badge/built%20with-Kujo-white.svg)](https://github.com/kujolang/kujo)
+
 CaseFile packages local workflow evidence into structured, reviewable case bundles for handoff, triage, and remediation.
 
 It converts failed commands, imported logs, or manual incident notes into reproducible artifacts with preserved provenance and reproduction notes.
