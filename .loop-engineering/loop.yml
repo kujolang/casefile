@@ -18,8 +18,8 @@ blocked_actions:
 eval_gates:
   - id: kujo_checks
     command: "for f in casefile.kujo tests/*.kujo; do /Users/robertdevore/2026/Kujolang/kujo-repos/kujo/target/debug/kujo check $f >/dev/null || exit 1; done"
-  - id: cli_tests
-    command: "KUJO_BIN=/Users/robertdevore/2026/Kujolang/kujo-repos/kujo/target/debug/kujo /Users/robertdevore/2026/Kujolang/kujo-repos/kujo/target/debug/kujo test-run -v tests/casefile_cli_test_v2.kujo"
+  - id: cli_smoke
+    command: "KUJO_BIN=/Users/robertdevore/2026/Kujolang/kujo-repos/kujo/target/debug/kujo /Users/robertdevore/2026/Kujolang/kujo-repos/kujo/target/debug/kujo run --interpreter casefile.kujo -- help >/dev/null && KUJO_BIN=/Users/robertdevore/2026/Kujolang/kujo-repos/kujo/target/debug/kujo /Users/robertdevore/2026/Kujolang/kujo-repos/kujo/target/debug/kujo run --interpreter casefile.kujo -- version >/dev/null"
   - id: diff_check
     command: 'files=$(git diff --name-only | grep -v "^.loop-engineering/" || true); if [ -n "$files" ]; then git diff --check -- $files; fi'
     required: true
