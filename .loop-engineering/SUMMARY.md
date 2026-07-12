@@ -2,17 +2,17 @@
 
 ## Verdict
 
-blocked
+success
 
 ## Completed
 
-- configured loop run completed through iteration 3
+- configured loop run completed through iteration 1
 
 ## Verification
 
-- passed: kujo_checks, diff_check, kujo_checks, diff_check, kujo_checks, diff_check
+- passed: kujo_checks, cli_tests, diff_check
 - blocked: none
-- failed: cli_smoke, cli_smoke, cli_smoke
+- failed: none
 
 ## Commits
 
@@ -28,4 +28,4 @@ blocked
 
 ## Next Start
 
-- repeated-failure: required gate failed 3 times
+- success: required gates passed
