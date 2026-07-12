@@ -2,30 +2,30 @@
 
 ## Verdict
 
-not-run
+blocked
 
 ## Completed
 
-- none
+- configured loop run completed through iteration 3
 
 ## Verification
 
-- passed: none
+- passed: cli_tests, diff_check, cli_tests, diff_check, cli_tests, diff_check
 - blocked: none
-- failed: none
+- failed: kujo_checks, kujo_checks, kujo_checks
 
 ## Commits
 
-- none
+- Loop engineering: Audit HLP-001 safe_write and HLP-013 process accessors; retain security/error-shaping wrappers unless a behavior-preserving native replacement is proven.
 
 ## Remaining
 
-- configure objective/checklist_file in loop.yml
+- none
 
 ## External Blockers
 
-- none
+- process-result-normalization-contract: Define a typed ProcessResult compatibility contract for missing fields and null streams, then replace the defensive adapter with native fields and regression fixtures.
 
 ## Next Start
 
-- scripts/run-workflow.sh --config .loop-engineering/loop.yml
+- repeated-failure: required gate failed 3 times

@@ -1,0 +1,33 @@
+
+## gate: kujo_checks
+$ for f in casefile.kujo tests/*.kujo; do /Users/robertdevore/2026/Kujolang/kujo-repos/kujo/target/debug/kujo check \"$f\" >/dev/null || exit 1; done
+[KUJOCLI001] [cli] error: Failed to read .kujo file '"casefile.kujo"': No such file or directory (os error 2)
+
+## gate: cli_tests
+$ KUJO_BIN=/Users/robertdevore/2026/Kujolang/kujo-repos/kujo/target/debug/kujo /Users/robertdevore/2026/Kujolang/kujo-repos/kujo/target/debug/kujo test-run -v tests/casefile_cli_test_v2.kujo
+
+============================================================
+Test Results
+============================================================
+  ✓ help output is byte stable (272ms)
+  ✓ init creates casefile.toml (204ms)
+  ✓ validate passes after init (355ms)
+  ✓ capture accepts absolute output_dir inside repo (6784ms)
+  ✓ capture rejects prefix-sibling output_dir (367ms)
+  ✓ validate rejects traversal output_dir (334ms)
+  ✓ capture command writes case artifacts (5233ms)
+  ✓ mirror exit code returns failing command status (5237ms)
+  ✓ list and show latest commands work (5265ms)
+  ✓ clean dry-run reports deletions (13924ms)
+  ✓ capture redacts command arguments logs and notes (4671ms)
+
+Tests: 11 total, 11 passed, 0 failed
+Time:  42655ms
+============================================================
+
+All tests passed! ✨
+gate cli_tests: pass
+
+## gate: diff_check
+$ git diff --check
+gate diff_check: pass

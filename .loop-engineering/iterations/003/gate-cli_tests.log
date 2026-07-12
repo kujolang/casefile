@@ -1,0 +1,21 @@
+
+============================================================
+Test Results
+============================================================
+  ✓ help output is byte stable (161ms)
+  ✓ init creates casefile.toml (197ms)
+  ✓ validate passes after init (340ms)
+  ✓ capture accepts absolute output_dir inside repo (4864ms)
+  ✓ capture rejects prefix-sibling output_dir (352ms)
+  ✓ validate rejects traversal output_dir (305ms)
+  ✓ capture command writes case artifacts (4446ms)
+  ✓ mirror exit code returns failing command status (4278ms)
+  ✓ list and show latest commands work (4098ms)
+  ✓ clean dry-run reports deletions (14816ms)
+  ✓ capture redacts command arguments logs and notes (4319ms)
+
+Tests: 11 total, 11 passed, 0 failed
+Time:  38185ms
+============================================================
+
+All tests passed! ✨
