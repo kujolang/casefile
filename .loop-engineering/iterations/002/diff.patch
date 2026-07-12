@@ -1,167 +1,390 @@
 diff --git a/.loop-engineering/iterations/001/context.md b/.loop-engineering/iterations/001/context.md
-index 82223b9..2814c45 100644
+index 2814c45..18fc6c4 100644
 --- a/.loop-engineering/iterations/001/context.md
 +++ b/.loop-engineering/iterations/001/context.md
-@@ -1,6 +1,6 @@
+@@ -1,6 +1,9 @@
  # Context
  
  - objective: Audit HLP-001 safe_write and HLP-013 process accessors; retain security/error-shaping wrappers unless a behavior-preserving native replacement is proven.
--- git_head: 385ce31
-+- git_head: b350127
- - changed_files:
-   - none
-diff --git a/.loop-engineering/iterations/001/diff.patch b/.loop-engineering/iterations/001/diff.patch
-index e69de29..ea3fd3e 100644
---- a/.loop-engineering/iterations/001/diff.patch
-+++ b/.loop-engineering/iterations/001/diff.patch
-@@ -0,0 +1,12 @@
-+diff --git a/.loop-engineering/iterations/001/context.md b/.loop-engineering/iterations/001/context.md
-+index 82223b9..2814c45 100644
-+--- a/.loop-engineering/iterations/001/context.md
-++++ b/.loop-engineering/iterations/001/context.md
-+@@ -1,6 +1,6 @@
-+ # Context
-+ 
-+ - objective: Audit HLP-001 safe_write and HLP-013 process accessors; retain security/error-shaping wrappers unless a behavior-preserving native replacement is proven.
-+-- git_head: 385ce31
-++- git_head: b350127
-+ - changed_files:
-+   - none
-diff --git a/.loop-engineering/iterations/001/eval.log b/.loop-engineering/iterations/001/eval.log
-index f5200e5..9480141 100644
---- a/.loop-engineering/iterations/001/eval.log
-+++ b/.loop-engineering/iterations/001/eval.log
-@@ -1,7 +1,7 @@
- 
- ## gate: kujo_checks
--$ for f in casefile.kujo tests/*.kujo; do /Users/robertdevore/2026/Kujolang/kujo-repos/kujo/target/debug/kujo check \"$f\" >/dev/null || exit 1; done
--[KUJOCLI001] [cli] error: Failed to read .kujo file '"casefile.kujo"': No such file or directory (os error 2)
-+$ for f in casefile.kujo tests/*.kujo; do /Users/robertdevore/2026/Kujolang/kujo-repos/kujo/target/debug/kujo check $f >/dev/null || exit 1; done
-+gate kujo_checks: pass
- 
- ## gate: cli_tests
- $ KUJO_BIN=/Users/robertdevore/2026/Kujolang/kujo-repos/kujo/target/debug/kujo /Users/robertdevore/2026/Kujolang/kujo-repos/kujo/target/debug/kujo test-run -v tests/casefile_cli_test_v2.kujo
-@@ -9,20 +9,20 @@ $ KUJO_BIN=/Users/robertdevore/2026/Kujolang/kujo-repos/kujo/target/debug/kujo /
- ============================================================
- Test Results
- ============================================================
--  ✓ help output is byte stable (272ms)
--  ✓ init creates casefile.toml (204ms)
--  ✓ validate passes after init (355ms)
--  ✓ capture accepts absolute output_dir inside repo (6784ms)
--  ✓ capture rejects prefix-sibling output_dir (367ms)
--  ✓ validate rejects traversal output_dir (334ms)
--  ✓ capture command writes case artifacts (5233ms)
--  ✓ mirror exit code returns failing command status (5237ms)
--  ✓ list and show latest commands work (5265ms)
--  ✓ clean dry-run reports deletions (13924ms)
--  ✓ capture redacts command arguments logs and notes (4671ms)
-+  ✓ help output is byte stable (213ms)
-+  ✓ init creates casefile.toml (264ms)
-+  ✓ validate passes after init (476ms)
-+  ✓ capture accepts absolute output_dir inside repo (8396ms)
-+  ✓ capture rejects prefix-sibling output_dir (564ms)
-+  ✓ validate rejects traversal output_dir (447ms)
-+  ✓ capture command writes case artifacts (6899ms)
-+  ✓ mirror exit code returns failing command status (5911ms)
-+  ✓ list and show latest commands work (6099ms)
-+  ✓ clean dry-run reports deletions (44367ms)
-+  ✓ capture redacts command arguments logs and notes (12616ms)
- 
- Tests: 11 total, 11 passed, 0 failed
--Time:  42655ms
-+Time:  86263ms
- ============================================================
- 
- All tests passed! ✨
-@@ -30,4 +30,5 @@ gate cli_tests: pass
- 
- ## gate: diff_check
- $ git diff --check
--gate diff_check: pass
-+.loop-engineering/iterations/001/diff.patch:7: trailing whitespace.
-++ 
-diff --git a/.loop-engineering/iterations/001/gate-cli_tests.log b/.loop-engineering/iterations/001/gate-cli_tests.log
-index 849ffd8..bcbe324 100644
---- a/.loop-engineering/iterations/001/gate-cli_tests.log
-+++ b/.loop-engineering/iterations/001/gate-cli_tests.log
-@@ -2,20 +2,20 @@
- ============================================================
- Test Results
- ============================================================
--  ✓ help output is byte stable (272ms)
--  ✓ init creates casefile.toml (204ms)
--  ✓ validate passes after init (355ms)
--  ✓ capture accepts absolute output_dir inside repo (6784ms)
--  ✓ capture rejects prefix-sibling output_dir (367ms)
--  ✓ validate rejects traversal output_dir (334ms)
--  ✓ capture command writes case artifacts (5233ms)
--  ✓ mirror exit code returns failing command status (5237ms)
--  ✓ list and show latest commands work (5265ms)
--  ✓ clean dry-run reports deletions (13924ms)
--  ✓ capture redacts command arguments logs and notes (4671ms)
-+  ✓ help output is byte stable (213ms)
-+  ✓ init creates casefile.toml (264ms)
-+  ✓ validate passes after init (476ms)
-+  ✓ capture accepts absolute output_dir inside repo (8396ms)
-+  ✓ capture rejects prefix-sibling output_dir (564ms)
-+  ✓ validate rejects traversal output_dir (447ms)
-+  ✓ capture command writes case artifacts (6899ms)
-+  ✓ mirror exit code returns failing command status (5911ms)
-+  ✓ list and show latest commands work (6099ms)
-+  ✓ clean dry-run reports deletions (44367ms)
-+  ✓ capture redacts command arguments logs and notes (12616ms)
- 
- Tests: 11 total, 11 passed, 0 failed
--Time:  42655ms
-+Time:  86263ms
- ============================================================
- 
- All tests passed! ✨
-diff --git a/.loop-engineering/iterations/001/gate-diff_check.log b/.loop-engineering/iterations/001/gate-diff_check.log
-index e69de29..c7d2582 100644
---- a/.loop-engineering/iterations/001/gate-diff_check.log
-+++ b/.loop-engineering/iterations/001/gate-diff_check.log
-@@ -0,0 +1,2 @@
-+.loop-engineering/iterations/001/diff.patch:7: trailing whitespace.
-++ 
-diff --git a/.loop-engineering/iterations/001/gate-kujo_checks.log b/.loop-engineering/iterations/001/gate-kujo_checks.log
-index 21a58d0..e69de29 100644
---- a/.loop-engineering/iterations/001/gate-kujo_checks.log
-+++ b/.loop-engineering/iterations/001/gate-kujo_checks.log
-@@ -1 +0,0 @@
--[KUJOCLI001] [cli] error: Failed to read .kujo file '"casefile.kujo"': No such file or directory (os error 2)
-diff --git a/.loop-engineering/iterations/002/context.md b/.loop-engineering/iterations/002/context.md
-index 82223b9..29ccdfe 100644
---- a/.loop-engineering/iterations/002/context.md
-+++ b/.loop-engineering/iterations/002/context.md
-@@ -1,6 +1,7 @@
- # Context
- 
- - objective: Audit HLP-001 safe_write and HLP-013 process accessors; retain security/error-shaping wrappers unless a behavior-preserving native replacement is proven.
--- git_head: 385ce31
-+- git_head: b350127
+-- git_head: b350127
++- git_head: f5664d5
  - changed_files:
 -  - none
 +  - .loop-engineering/iterations/001/context.md
 +  - .loop-engineering/iterations/001/diff.patch
++  - .loop-engineering/iterations/001/eval.log
++  - .loop-engineering/iterations/001/gate-cli_tests.log
+diff --git a/.loop-engineering/iterations/001/diff.patch b/.loop-engineering/iterations/001/diff.patch
+index ea3fd3e..cc1387c 100644
+--- a/.loop-engineering/iterations/001/diff.patch
++++ b/.loop-engineering/iterations/001/diff.patch
+@@ -1,12 +1,94 @@
+ diff --git a/.loop-engineering/iterations/001/context.md b/.loop-engineering/iterations/001/context.md
+-index 82223b9..2814c45 100644
++index 2814c45..18fc6c4 100644
+ --- a/.loop-engineering/iterations/001/context.md
+ +++ b/.loop-engineering/iterations/001/context.md
+-@@ -1,6 +1,6 @@
++@@ -1,6 +1,9 @@
+  # Context
+  
+  - objective: Audit HLP-001 safe_write and HLP-013 process accessors; retain security/error-shaping wrappers unless a behavior-preserving native replacement is proven.
+--- git_head: 385ce31
+-+- git_head: b350127
++-- git_head: b350127
+++- git_head: f5664d5
+  - changed_files:
+-   - none
++-  - none
+++  - .loop-engineering/iterations/001/context.md
+++  - .loop-engineering/iterations/001/diff.patch
+++  - .loop-engineering/iterations/001/eval.log
+++  - .loop-engineering/iterations/001/gate-cli_tests.log
++diff --git a/.loop-engineering/iterations/001/diff.patch b/.loop-engineering/iterations/001/diff.patch
++index ea3fd3e..e69de29 100644
++--- a/.loop-engineering/iterations/001/diff.patch
+++++ b/.loop-engineering/iterations/001/diff.patch
++@@ -1,12 +0,0 @@
++-diff --git a/.loop-engineering/iterations/001/context.md b/.loop-engineering/iterations/001/context.md
++-index 82223b9..2814c45 100644
++---- a/.loop-engineering/iterations/001/context.md
++-+++ b/.loop-engineering/iterations/001/context.md
++-@@ -1,6 +1,6 @@
++- # Context
++- 
++- - objective: Audit HLP-001 safe_write and HLP-013 process accessors; retain security/error-shaping wrappers unless a behavior-preserving native replacement is proven.
++--- git_head: 385ce31
++-+- git_head: b350127
++- - changed_files:
++-   - none
++diff --git a/.loop-engineering/iterations/001/eval.log b/.loop-engineering/iterations/001/eval.log
++index 9480141..8e78313 100644
++--- a/.loop-engineering/iterations/001/eval.log
+++++ b/.loop-engineering/iterations/001/eval.log
++@@ -5,30 +5,3 @@ gate kujo_checks: pass
++ 
++ ## gate: cli_tests
++ $ KUJO_BIN=/Users/robertdevore/2026/Kujolang/kujo-repos/kujo/target/debug/kujo /Users/robertdevore/2026/Kujolang/kujo-repos/kujo/target/debug/kujo test-run -v tests/casefile_cli_test_v2.kujo
++-
++-============================================================
++-Test Results
++-============================================================
++-  ✓ help output is byte stable (213ms)
++-  ✓ init creates casefile.toml (264ms)
++-  ✓ validate passes after init (476ms)
++-  ✓ capture accepts absolute output_dir inside repo (8396ms)
++-  ✓ capture rejects prefix-sibling output_dir (564ms)
++-  ✓ validate rejects traversal output_dir (447ms)
++-  ✓ capture command writes case artifacts (6899ms)
++-  ✓ mirror exit code returns failing command status (5911ms)
++-  ✓ list and show latest commands work (6099ms)
++-  ✓ clean dry-run reports deletions (44367ms)
++-  ✓ capture redacts command arguments logs and notes (12616ms)
++-
++-Tests: 11 total, 11 passed, 0 failed
++-Time:  86263ms
++-============================================================
++-
++-All tests passed! ✨
++-gate cli_tests: pass
++-
++-## gate: diff_check
++-$ git diff --check
++-.loop-engineering/iterations/001/diff.patch:7: trailing whitespace.
++-+ 
++diff --git a/.loop-engineering/iterations/001/gate-cli_tests.log b/.loop-engineering/iterations/001/gate-cli_tests.log
++index bcbe324..e69de29 100644
++--- a/.loop-engineering/iterations/001/gate-cli_tests.log
+++++ b/.loop-engineering/iterations/001/gate-cli_tests.log
++@@ -1,21 +0,0 @@
++-
++-============================================================
++-Test Results
++-============================================================
++-  ✓ help output is byte stable (213ms)
++-  ✓ init creates casefile.toml (264ms)
++-  ✓ validate passes after init (476ms)
++-  ✓ capture accepts absolute output_dir inside repo (8396ms)
++-  ✓ capture rejects prefix-sibling output_dir (564ms)
++-  ✓ validate rejects traversal output_dir (447ms)
++-  ✓ capture command writes case artifacts (6899ms)
++-  ✓ mirror exit code returns failing command status (5911ms)
++-  ✓ list and show latest commands work (6099ms)
++-  ✓ clean dry-run reports deletions (44367ms)
++-  ✓ capture redacts command arguments logs and notes (12616ms)
++-
++-Tests: 11 total, 11 passed, 0 failed
++-Time:  86263ms
++-============================================================
++-
++-All tests passed! ✨
+diff --git a/.loop-engineering/iterations/001/eval.log b/.loop-engineering/iterations/001/eval.log
+index 9480141..ea4fffe 100644
+--- a/.loop-engineering/iterations/001/eval.log
++++ b/.loop-engineering/iterations/001/eval.log
+@@ -3,32 +3,9 @@
+ $ for f in casefile.kujo tests/*.kujo; do /Users/robertdevore/2026/Kujolang/kujo-repos/kujo/target/debug/kujo check $f >/dev/null || exit 1; done
+ gate kujo_checks: pass
+ 
+-## gate: cli_tests
+-$ KUJO_BIN=/Users/robertdevore/2026/Kujolang/kujo-repos/kujo/target/debug/kujo /Users/robertdevore/2026/Kujolang/kujo-repos/kujo/target/debug/kujo test-run -v tests/casefile_cli_test_v2.kujo
+-
+-============================================================
+-Test Results
+-============================================================
+-  ✓ help output is byte stable (213ms)
+-  ✓ init creates casefile.toml (264ms)
+-  ✓ validate passes after init (476ms)
+-  ✓ capture accepts absolute output_dir inside repo (8396ms)
+-  ✓ capture rejects prefix-sibling output_dir (564ms)
+-  ✓ validate rejects traversal output_dir (447ms)
+-  ✓ capture command writes case artifacts (6899ms)
+-  ✓ mirror exit code returns failing command status (5911ms)
+-  ✓ list and show latest commands work (6099ms)
+-  ✓ clean dry-run reports deletions (44367ms)
+-  ✓ capture redacts command arguments logs and notes (12616ms)
+-
+-Tests: 11 total, 11 passed, 0 failed
+-Time:  86263ms
+-============================================================
+-
+-All tests passed! ✨
+-gate cli_tests: pass
++## gate: cli_smoke
++$ KUJO_BIN=/Users/robertdevore/2026/Kujolang/kujo-repos/kujo/target/debug/kujo /Users/robertdevore/2026/Kujolang/kujo-repos/kujo/target/debug/kujo run --interpreter casefile.kujo -- help >/dev/null && KUJO_BIN=/Users/robertdevore/2026/Kujolang/kujo-repos/kujo/target/debug/kujo /Users/robertdevore/2026/Kujolang/kujo-repos/kujo/target/debug/kujo run --interpreter casefile.kujo -- version >/dev/null
+ 
+ ## gate: diff_check
+-$ git diff --check
+-.loop-engineering/iterations/001/diff.patch:7: trailing whitespace.
+-+ 
++$ files=$(git diff --name-only | grep -v "^.loop-engineering/" || true); if [ -n "$files" ]; then git diff --check -- $files; fi
++gate diff_check: pass
+diff --git a/.loop-engineering/iterations/001/gate-cli_tests.log b/.loop-engineering/iterations/001/gate-cli_tests.log
+index bcbe324..e69de29 100644
+--- a/.loop-engineering/iterations/001/gate-cli_tests.log
++++ b/.loop-engineering/iterations/001/gate-cli_tests.log
+@@ -1,21 +0,0 @@
+-
+-============================================================
+-Test Results
+-============================================================
+-  ✓ help output is byte stable (213ms)
+-  ✓ init creates casefile.toml (264ms)
+-  ✓ validate passes after init (476ms)
+-  ✓ capture accepts absolute output_dir inside repo (8396ms)
+-  ✓ capture rejects prefix-sibling output_dir (564ms)
+-  ✓ validate rejects traversal output_dir (447ms)
+-  ✓ capture command writes case artifacts (6899ms)
+-  ✓ mirror exit code returns failing command status (5911ms)
+-  ✓ list and show latest commands work (6099ms)
+-  ✓ clean dry-run reports deletions (44367ms)
+-  ✓ capture redacts command arguments logs and notes (12616ms)
+-
+-Tests: 11 total, 11 passed, 0 failed
+-Time:  86263ms
+-============================================================
+-
+-All tests passed! ✨
+diff --git a/.loop-engineering/iterations/001/gate-diff_check.log b/.loop-engineering/iterations/001/gate-diff_check.log
+index c7d2582..e69de29 100644
+--- a/.loop-engineering/iterations/001/gate-diff_check.log
++++ b/.loop-engineering/iterations/001/gate-diff_check.log
+@@ -1,2 +0,0 @@
+-.loop-engineering/iterations/001/diff.patch:7: trailing whitespace.
+-+ 
+diff --git a/.loop-engineering/iterations/002/context.md b/.loop-engineering/iterations/002/context.md
+index 29ccdfe..18fc6c4 100644
+--- a/.loop-engineering/iterations/002/context.md
++++ b/.loop-engineering/iterations/002/context.md
+@@ -1,7 +1,9 @@
+ # Context
+ 
+ - objective: Audit HLP-001 safe_write and HLP-013 process accessors; retain security/error-shaping wrappers unless a behavior-preserving native replacement is proven.
+-- git_head: b350127
++- git_head: f5664d5
+ - changed_files:
+   - .loop-engineering/iterations/001/context.md
+   - .loop-engineering/iterations/001/diff.patch
++  - .loop-engineering/iterations/001/eval.log
++  - .loop-engineering/iterations/001/gate-cli_tests.log
 diff --git a/.loop-engineering/iterations/002/diff.patch b/.loop-engineering/iterations/002/diff.patch
-index d1c2beb..a1a34c6 100644
+index 89d2953..3705a2a 100644
 --- a/.loop-engineering/iterations/002/diff.patch
 +++ b/.loop-engineering/iterations/002/diff.patch
-@@ -1,7 +0,0 @@
+@@ -1,168 +0,0 @@
+-diff --git a/.loop-engineering/iterations/001/context.md b/.loop-engineering/iterations/001/context.md
+-index 82223b9..2814c45 100644
+---- a/.loop-engineering/iterations/001/context.md
+-+++ b/.loop-engineering/iterations/001/context.md
+-@@ -1,6 +1,6 @@
+- # Context
+- 
+- - objective: Audit HLP-001 safe_write and HLP-013 process accessors; retain security/error-shaping wrappers unless a behavior-preserving native replacement is proven.
+--- git_head: 385ce31
+-+- git_head: b350127
+- - changed_files:
+-   - none
+-diff --git a/.loop-engineering/iterations/001/diff.patch b/.loop-engineering/iterations/001/diff.patch
+-index e69de29..ea3fd3e 100644
+---- a/.loop-engineering/iterations/001/diff.patch
+-+++ b/.loop-engineering/iterations/001/diff.patch
+-@@ -0,0 +1,12 @@
+-+diff --git a/.loop-engineering/iterations/001/context.md b/.loop-engineering/iterations/001/context.md
+-+index 82223b9..2814c45 100644
+-+--- a/.loop-engineering/iterations/001/context.md
+-++++ b/.loop-engineering/iterations/001/context.md
+-+@@ -1,6 +1,6 @@
+-+ # Context
+-+ 
+-+ - objective: Audit HLP-001 safe_write and HLP-013 process accessors; retain security/error-shaping wrappers unless a behavior-preserving native replacement is proven.
+-+-- git_head: 385ce31
+-++- git_head: b350127
+-+ - changed_files:
+-+   - none
+-diff --git a/.loop-engineering/iterations/001/eval.log b/.loop-engineering/iterations/001/eval.log
+-index f5200e5..9480141 100644
+---- a/.loop-engineering/iterations/001/eval.log
+-+++ b/.loop-engineering/iterations/001/eval.log
+-@@ -1,7 +1,7 @@
+- 
+- ## gate: kujo_checks
+--$ for f in casefile.kujo tests/*.kujo; do /Users/robertdevore/2026/Kujolang/kujo-repos/kujo/target/debug/kujo check \"$f\" >/dev/null || exit 1; done
+--[KUJOCLI001] [cli] error: Failed to read .kujo file '"casefile.kujo"': No such file or directory (os error 2)
+-+$ for f in casefile.kujo tests/*.kujo; do /Users/robertdevore/2026/Kujolang/kujo-repos/kujo/target/debug/kujo check $f >/dev/null || exit 1; done
+-+gate kujo_checks: pass
+- 
+- ## gate: cli_tests
+- $ KUJO_BIN=/Users/robertdevore/2026/Kujolang/kujo-repos/kujo/target/debug/kujo /Users/robertdevore/2026/Kujolang/kujo-repos/kujo/target/debug/kujo test-run -v tests/casefile_cli_test_v2.kujo
+-@@ -9,20 +9,20 @@ $ KUJO_BIN=/Users/robertdevore/2026/Kujolang/kujo-repos/kujo/target/debug/kujo /
+- ============================================================
+- Test Results
+- ============================================================
+--  ✓ help output is byte stable (272ms)
+--  ✓ init creates casefile.toml (204ms)
+--  ✓ validate passes after init (355ms)
+--  ✓ capture accepts absolute output_dir inside repo (6784ms)
+--  ✓ capture rejects prefix-sibling output_dir (367ms)
+--  ✓ validate rejects traversal output_dir (334ms)
+--  ✓ capture command writes case artifacts (5233ms)
+--  ✓ mirror exit code returns failing command status (5237ms)
+--  ✓ list and show latest commands work (5265ms)
+--  ✓ clean dry-run reports deletions (13924ms)
+--  ✓ capture redacts command arguments logs and notes (4671ms)
+-+  ✓ help output is byte stable (213ms)
+-+  ✓ init creates casefile.toml (264ms)
+-+  ✓ validate passes after init (476ms)
+-+  ✓ capture accepts absolute output_dir inside repo (8396ms)
+-+  ✓ capture rejects prefix-sibling output_dir (564ms)
+-+  ✓ validate rejects traversal output_dir (447ms)
+-+  ✓ capture command writes case artifacts (6899ms)
+-+  ✓ mirror exit code returns failing command status (5911ms)
+-+  ✓ list and show latest commands work (6099ms)
+-+  ✓ clean dry-run reports deletions (44367ms)
+-+  ✓ capture redacts command arguments logs and notes (12616ms)
+- 
+- Tests: 11 total, 11 passed, 0 failed
+--Time:  42655ms
+-+Time:  86263ms
+- ============================================================
+- 
+- All tests passed! ✨
+-@@ -30,4 +30,5 @@ gate cli_tests: pass
+- 
+- ## gate: diff_check
+- $ git diff --check
+--gate diff_check: pass
+-+.loop-engineering/iterations/001/diff.patch:7: trailing whitespace.
+-++ 
+-diff --git a/.loop-engineering/iterations/001/gate-cli_tests.log b/.loop-engineering/iterations/001/gate-cli_tests.log
+-index 849ffd8..bcbe324 100644
+---- a/.loop-engineering/iterations/001/gate-cli_tests.log
+-+++ b/.loop-engineering/iterations/001/gate-cli_tests.log
+-@@ -2,20 +2,20 @@
+- ============================================================
+- Test Results
+- ============================================================
+--  ✓ help output is byte stable (272ms)
+--  ✓ init creates casefile.toml (204ms)
+--  ✓ validate passes after init (355ms)
+--  ✓ capture accepts absolute output_dir inside repo (6784ms)
+--  ✓ capture rejects prefix-sibling output_dir (367ms)
+--  ✓ validate rejects traversal output_dir (334ms)
+--  ✓ capture command writes case artifacts (5233ms)
+--  ✓ mirror exit code returns failing command status (5237ms)
+--  ✓ list and show latest commands work (5265ms)
+--  ✓ clean dry-run reports deletions (13924ms)
+--  ✓ capture redacts command arguments logs and notes (4671ms)
+-+  ✓ help output is byte stable (213ms)
+-+  ✓ init creates casefile.toml (264ms)
+-+  ✓ validate passes after init (476ms)
+-+  ✓ capture accepts absolute output_dir inside repo (8396ms)
+-+  ✓ capture rejects prefix-sibling output_dir (564ms)
+-+  ✓ validate rejects traversal output_dir (447ms)
+-+  ✓ capture command writes case artifacts (6899ms)
+-+  ✓ mirror exit code returns failing command status (5911ms)
+-+  ✓ list and show latest commands work (6099ms)
+-+  ✓ clean dry-run reports deletions (44367ms)
+-+  ✓ capture redacts command arguments logs and notes (12616ms)
+- 
+- Tests: 11 total, 11 passed, 0 failed
+--Time:  42655ms
+-+Time:  86263ms
+- ============================================================
+- 
+- All tests passed! ✨
+-diff --git a/.loop-engineering/iterations/001/gate-diff_check.log b/.loop-engineering/iterations/001/gate-diff_check.log
+-index e69de29..c7d2582 100644
+---- a/.loop-engineering/iterations/001/gate-diff_check.log
+-+++ b/.loop-engineering/iterations/001/gate-diff_check.log
+-@@ -0,0 +1,2 @@
+-+.loop-engineering/iterations/001/diff.patch:7: trailing whitespace.
+-++ 
+-diff --git a/.loop-engineering/iterations/001/gate-kujo_checks.log b/.loop-engineering/iterations/001/gate-kujo_checks.log
+-index 21a58d0..e69de29 100644
+---- a/.loop-engineering/iterations/001/gate-kujo_checks.log
+-+++ b/.loop-engineering/iterations/001/gate-kujo_checks.log
+-@@ -1 +0,0 @@
+--[KUJOCLI001] [cli] error: Failed to read .kujo file '"casefile.kujo"': No such file or directory (os error 2)
+-diff --git a/.loop-engineering/iterations/002/context.md b/.loop-engineering/iterations/002/context.md
+-index 82223b9..29ccdfe 100644
+---- a/.loop-engineering/iterations/002/context.md
+-+++ b/.loop-engineering/iterations/002/context.md
+-@@ -1,6 +1,7 @@
+- # Context
+- 
+- - objective: Audit HLP-001 safe_write and HLP-013 process accessors; retain security/error-shaping wrappers unless a behavior-preserving native replacement is proven.
+--- git_head: 385ce31
+-+- git_head: b350127
+- - changed_files:
+--  - none
+-+  - .loop-engineering/iterations/001/context.md
+-+  - .loop-engineering/iterations/001/diff.patch
+-diff --git a/.loop-engineering/iterations/002/diff.patch b/.loop-engineering/iterations/002/diff.patch
+-index d1c2beb..a1a34c6 100644
+---- a/.loop-engineering/iterations/002/diff.patch
+-+++ b/.loop-engineering/iterations/002/diff.patch
+-@@ -1,7 +0,0 @@
+--diff --git a/.loop-engineering/ledger.tsv b/.loop-engineering/ledger.tsv
+--index dafd866..4c16fa3 100644
+----- a/.loop-engineering/ledger.tsv
+--+++ b/.loop-engineering/ledger.tsv
+--@@ -1 +1,2 @@
+-- iteration	action	verdict	progress	evidence	justification
+--+001	configured-gates	failed	0	iterations/001/eval.log	required gate failed
 -diff --git a/.loop-engineering/ledger.tsv b/.loop-engineering/ledger.tsv
--index dafd866..4c16fa3 100644
+-index 58d34e4..e44f278 100644
 ---- a/.loop-engineering/ledger.tsv
 -+++ b/.loop-engineering/ledger.tsv
--@@ -1 +1,2 @@
-- iteration	action	verdict	progress	evidence	justification
+-@@ -2,3 +2,4 @@ iteration	action	verdict	progress	evidence	justification
+- 001	configured-gates	failed	0	iterations/001/eval.log	required gate failed
+- 002	configured-gates	failed	0	iterations/002/eval.log	required gate failed
+- 003	configured-gates	failed	0	iterations/003/eval.log	required gate failed
 -+001	configured-gates	failed	0	iterations/001/eval.log	required gate failed
 diff --git a/.loop-engineering/ledger.tsv b/.loop-engineering/ledger.tsv
-index 58d34e4..e44f278 100644
+index 3bfd30d..73e4200 100644
 --- a/.loop-engineering/ledger.tsv
 +++ b/.loop-engineering/ledger.tsv
-@@ -2,3 +2,4 @@ iteration	action	verdict	progress	evidence	justification
+@@ -5,3 +5,4 @@ iteration	action	verdict	progress	evidence	justification
  001	configured-gates	failed	0	iterations/001/eval.log	required gate failed
  002	configured-gates	failed	0	iterations/002/eval.log	required gate failed
  003	configured-gates	failed	0	iterations/003/eval.log	required gate failed
