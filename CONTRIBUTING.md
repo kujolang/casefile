@@ -22,18 +22,16 @@ safety, guarded cleanup semantics, deterministic local execution, and structured
 
 ## Local Setup
 
-Use the Kujo runtime expected by this repository. Most repos support one of
-these environment variables:
+Install Kujo so the `kujo` command is available on your `PATH`:
 
 ```bash
-export KUJO_BIN=kujo
-export KUJO=kujo
+kujo --version
 ```
 
 CaseFile usually uses the installed runtime while developing:
 
 ```bash
-export KUJO_BIN="kujo"
+kujo --version
 ```
 
 Primary script:
@@ -119,14 +117,14 @@ Core CaseFile validation:
 
 ```bash
 # Usage and command surface
-"$KUJO_BIN" run --interpreter casefile.kujo -- help
+kujo run --interpreter casefile.kujo -- help
 
 # Config lifecycle
-"$KUJO_BIN" run --interpreter casefile.kujo -- init
-"$KUJO_BIN" run --interpreter casefile.kujo -- validate
+kujo run --interpreter casefile.kujo -- init
+kujo run --interpreter casefile.kujo -- validate
 
 # Tests
-"$KUJO_BIN" test-run -v tests/casefile_cli_test_v2.kujo
+kujo test-run -v tests/casefile_cli_test_v2.kujo
 ```
 
 Use isolated temp directories for capture behavior tests so generated

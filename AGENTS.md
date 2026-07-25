@@ -5,7 +5,7 @@ Read `README.md` and `CONTRIBUTING.md` before changing code or examples.
 Use interpreter mode for repository workflows:
 
 ```bash
-"$KUJO_BIN" run --interpreter casefile.kujo -- <command>
+kujo run --interpreter casefile.kujo -- <command>
 ```
 
 Canonical copyable examples live in:

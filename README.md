@@ -40,18 +40,16 @@ It should not be described as universally enterprise grade yet. The remaining en
 ## Quick Start
 
 ```bash
-export KUJO_BIN="kujo"
-
 # bootstrap
-"$KUJO_BIN" run --interpreter casefile.kujo -- init
-"$KUJO_BIN" run --interpreter casefile.kujo -- validate
+kujo run --interpreter casefile.kujo -- init
+kujo run --interpreter casefile.kujo -- validate
 
 # capture a failing command
-"$KUJO_BIN" run --interpreter casefile.kujo -- capture --name failing-tests -- false
+kujo run --interpreter casefile.kujo -- capture --name failing-tests -- false
 
 # inspect captured cases
-"$KUJO_BIN" run --interpreter casefile.kujo -- list
-"$KUJO_BIN" run --interpreter casefile.kujo -- show latest --format markdown
+kujo run --interpreter casefile.kujo -- list
+kujo run --interpreter casefile.kujo -- show latest --format markdown
 ```
 
 Expected bootstrap output includes:
@@ -133,8 +131,7 @@ Files are mode-aware and only written when applicable.
 Run the Kujo-native test suite:
 
 ```bash
-export KUJO_BIN="kujo"
-"$KUJO_BIN" test-run -v tests/casefile_cli_test_v2.kujo
+kujo test-run -v tests/casefile_cli_test_v2.kujo
 ```
 
 ## Known Limitations
