@@ -7,7 +7,7 @@ Use `help` or `--help` to inspect the command surface. There is no standalone ve
 Set the Kujo binary once before running the workflows below:
 
 ```bash
-export KUJO_BIN="/path/to/kujo/target/debug/kujo"
+export KUJO_BIN="kujo"
 ```
 
 ## 1. Bootstrap a New Repository

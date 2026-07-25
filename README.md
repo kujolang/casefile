@@ -40,7 +40,7 @@ It should not be described as universally enterprise grade yet. The remaining en
 ## Quick Start
 
 ```bash
-export KUJO_BIN="/path/to/kujo/target/debug/kujo"
+export KUJO_BIN="kujo"
 
 # bootstrap
 "$KUJO_BIN" run --interpreter casefile.kujo -- init
@@ -133,7 +133,7 @@ Files are mode-aware and only written when applicable.
 Run the Kujo-native test suite:
 
 ```bash
-export KUJO_BIN="/path/to/kujo/target/debug/kujo"
+export KUJO_BIN="kujo"
 "$KUJO_BIN" test-run -v tests/casefile_cli_test_v2.kujo
 ```
 

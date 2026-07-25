@@ -26,14 +26,14 @@ Use the Kujo runtime expected by this repository. Most repos support one of
 these environment variables:
 
 ```bash
-export KUJO_BIN=/path/to/kujo
-export KUJO=/path/to/kujo
+export KUJO_BIN=kujo
+export KUJO=kujo
 ```
 
-CaseFile usually uses a debug runtime while developing:
+CaseFile usually uses the installed runtime while developing:
 
 ```bash
-export KUJO_BIN="/path/to/kujo/target/debug/kujo"
+export KUJO_BIN="kujo"
 ```
 
 Primary script:
