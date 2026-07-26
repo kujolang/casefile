@@ -1,0 +1,28 @@
+{
+  "name": "casefile-launch-readiness",
+  "version": "0.1.0",
+  "tests": [
+    {
+      "name": "CaseFile help succeeds",
+      "check": "command_succeeds",
+      "params": {
+        "command": "cd /Users/robertdevore/2026/Kujolang/kujo-repos/casefile && kujo run --interpreter casefile.kujo -- help"
+      }
+    },
+    {
+      "name": "CaseFile test suite succeeds",
+      "check": "command_succeeds",
+      "params": {
+        "command": "cd /Users/robertdevore/2026/Kujolang/kujo-repos/casefile && KUJO_BIN=kujo kujo test-run -v tests/casefile_cli_test_v2.kujo"
+      }
+    },
+    {
+      "name": "CaseFile unsupported version flag exits 2",
+      "check": "exit_code_equals",
+      "params": {
+        "command": "cd /Users/robertdevore/2026/Kujolang/kujo-repos/casefile && kujo run --interpreter casefile.kujo -- --version",
+        "expected": 2
+      }
+    }
+  ]
+}

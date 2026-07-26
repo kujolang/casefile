@@ -1,0 +1,69 @@
+name: "CaseFile launch readiness review"
+goal: "Keep CaseFile locally release-ready as a Kujo-native evidence bundle capture and handoff CLI."
+version: "1.0.0"
+background: "CaseFile is part of the Kujo prelaunch supporting-tooling matrix. The verified scope is local plaintext evidence capture, redaction-by-default, path-safe output handling, and deterministic review/handoff artifacts."
+scope: "Repository-local CLI behavior in interpreter mode, init/validate/doctor/list/show/capture/clean command contracts, redaction and output-path safety, docs/readiness wording, and launch evidence capture."
+non_goals:
+  - "Publishing packages or public releases"
+  - "Pushing final release tags"
+  - "Encrypted artifact storage"
+  - "Hosted incident management or enterprise evidence governance"
+relevant_systems:
+  - "Kujo runtime"
+  - "CaseFile CLI"
+  - ".casefile bundles"
+  - "casefile.toml"
+  - "prelaunch launch evidence packet"
+likely_files:
+  - "README.md"
+  - "FLAGS.md"
+  - "HOWTO.md"
+  - "SECURITY.md"
+  - "casefile.kujo"
+  - "tests/casefile_cli_test_v2.kujo"
+  - "tests/casefile_eval.json"
+acceptance_criteria:
+  - "`kujo run --interpreter casefile.kujo -- help` exits 0."
+  - "`kujo run --interpreter casefile.kujo -- init`, `validate`, and `doctor` pass in an isolated workspace."
+  - "`kujo test-run -v tests/casefile_cli_test_v2.kujo` passes."
+  - "Eval suite proves help, validation, unsupported version exit behavior, and repo-local test gate."
+  - "Docs keep plaintext artifact, redaction, retention, and enterprise-hardening boundaries explicit."
+eval_requirements:
+  - description: "CaseFile help succeeds."
+    check_type: "command_succeeds"
+    params:
+      command: "kujo run --interpreter casefile.kujo -- help"
+  - description: "CaseFile test suite succeeds."
+    check_type: "command_succeeds"
+    params:
+      command: "kujo test-run -v tests/casefile_cli_test_v2.kujo"
+  - description: "Unsupported version flag exits with usage error."
+    check_type: "exit_code_equals"
+    params:
+      command: "kujo run --interpreter casefile.kujo -- --version"
+      expected: 2
+risks:
+  - risk: "Generated bundles are plaintext at rest."
+    mitigation: "Keep sharing guidance explicit and treat encrypted storage as external hardening."
+    severity: "high"
+  - risk: "Redaction is pattern-based and may miss unknown secret formats."
+    mitigation: "Review bundles before sharing and keep `--no-redact` restricted to trusted local workflows."
+    severity: "medium"
+  - risk: "Capture timeout enforcement is not implemented."
+    mitigation: "Document timeout as a known limitation and use external timeout wrappers for CI where needed."
+    severity: "medium"
+dependencies:
+  - "kujo on PATH"
+  - "Git on PATH"
+review_expectations:
+  - "Review generated case bundles before sharing."
+  - "Review redaction and output path behavior before changing capture internals."
+human_approval_points:
+  - "Before publishing packages or public releases"
+  - "Before pushing final release tags"
+  - "Before claiming encrypted storage, hosted incident management, or enterprise evidence governance"
+priority: "high"
+tags:
+  - "kujo"
+  - "casefile"
+  - "launch-readiness"
