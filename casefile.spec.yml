@@ -49,8 +49,8 @@ risks:
   - risk: "Redaction is pattern-based and may miss unknown secret formats."
     mitigation: "Review bundles before sharing and keep `--no-redact` restricted to trusted local workflows."
     severity: "medium"
-  - risk: "Capture timeout enforcement is not implemented."
-    mitigation: "Document timeout as a known limitation and use external timeout wrappers for CI where needed."
+  - risk: "CaseFile has no user-configurable capture timeout; the runtime process timeout applies."
+    mitigation: "Document the runtime timeout and use an external supervisor where a different command lifetime is required."
     severity: "medium"
 dependencies:
   - "kujo on PATH"
