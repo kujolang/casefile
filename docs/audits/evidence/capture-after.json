@@ -1,0 +1,35 @@
+{
+  "samples": [
+    {
+      "elapsed_ms": 712.51,
+      "version_probes": 0,
+      "combined_log_bytes": 1024,
+      "truncated": true
+    },
+    {
+      "elapsed_ms": 683.33,
+      "version_probes": 0,
+      "combined_log_bytes": 1024,
+      "truncated": true
+    },
+    {
+      "elapsed_ms": 704.91,
+      "version_probes": 0,
+      "combined_log_bytes": 1024,
+      "truncated": true
+    },
+    {
+      "elapsed_ms": 708.65,
+      "version_probes": 0,
+      "combined_log_bytes": 1024,
+      "truncated": true
+    },
+    {
+      "elapsed_ms": 766.21,
+      "version_probes": 0,
+      "combined_log_bytes": 1024,
+      "truncated": true
+    }
+  ],
+  "median_ms": 708.65
+}

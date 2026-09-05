@@ -1,0 +1,35 @@
+{
+  "samples": [
+    {
+      "elapsed_ms": 735.91,
+      "version_probes": 9,
+      "combined_log_bytes": 1048576,
+      "truncated": false
+    },
+    {
+      "elapsed_ms": 773.54,
+      "version_probes": 9,
+      "combined_log_bytes": 1048576,
+      "truncated": false
+    },
+    {
+      "elapsed_ms": 721.65,
+      "version_probes": 9,
+      "combined_log_bytes": 1048576,
+      "truncated": false
+    },
+    {
+      "elapsed_ms": 695.3,
+      "version_probes": 9,
+      "combined_log_bytes": 1048576,
+      "truncated": false
+    },
+    {
+      "elapsed_ms": 722.6,
+      "version_probes": 9,
+      "combined_log_bytes": 1048576,
+      "truncated": false
+    }
+  ],
+  "median_ms": 722.6
+}
