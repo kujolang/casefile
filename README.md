@@ -22,7 +22,7 @@ Requirements: Kujo with `write_file_atomic` and `path_is_symlink` support (verif
 - [Verification and architecture](CONTRIBUTING.md)
 - [Hardening audit](docs/audits/repository-hardening.md)
 
-Drive-qualified paths passed to directory utilities use forward slashes for Git
+Drive-qualified and extended-length paths passed to file utilities use forward slashes for Git
 for Windows compatibility. Directory-creation failures include the utility error.
 Exclusive creation is preserved. POSIX uses mode0700; drive-qualified Windows
 paths inherit their parent ACL and require a private parent directory.
