@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import shutil
+import shlex
 import subprocess
 import tempfile
 import unittest
@@ -52,6 +53,26 @@ class Hardening(unittest.TestCase):
         result = self.run_cli('capture', '--name', 'fixture', '--format', 'json', *args)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         return json.loads(result.stdout)
+
+    def test_windows_utility_paths(self):
+        source = SCRIPT.read_text()
+        helper = source[source.index('func utility_path('):source.index('\nfunc ensure_directory')]
+        paths = [r'C:\temp\failure.log', r'\\?\C:\temp\failure.log', r'/tmp/literal\name']
+        probe = self.root / 'utility_probe.kujo'
+        calls = ','.join('utility_path(' + json.dumps(path) + ')' for path in paths)
+        probe.write_text(helper + '\nprint(to_json([' + calls + ']))\n')
+        result = subprocess.run([KUJO, 'run', str(probe)], text=True, capture_output=True, timeout=30)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(json.loads(result.stdout), ['C:/temp/failure.log', 'C:/temp/failure.log', paths[2]])
+
+    def test_directory_failure_exposes_utility_diagnostic(self):
+        helper = self.bin / 'mkdir'
+        real_mkdir = shlex.quote(shutil.which('mkdir'))
+        helper.write_text('#!/bin/sh\nif [ "$1" = "-m" ]; then echo "fixture directory failure" >&2; exit 1; fi\nexec ' + real_mkdir + ' "$@"\n')
+        helper.chmod(0o755)
+        result = self.run_cli('capture', '--manual', '--name', 'directory-error')
+        self.assertEqual(result.returncode, 4)
+        self.assertIn('fixture directory failure', result.stdout + result.stderr)
 
     def test_show_rejects_traversal(self):
         (self.ws / 'case.md').write_text('OUTSIDE SENTINEL')

@@ -2,7 +2,9 @@
 
 CaseFile operates with the user's permissions in a trusted local workspace. It is not a command sandbox. Executables, PATH, Git configuration, the Kujo runtime, and the workspace owner are trusted. Commands inherit the caller's environment and can access anything the caller can access.
 
-Output must be strictly below the repository root. Traversal, prefix-sibling escapes, output symlinks (including dangling ancestors), and symlinked show artifacts are rejected. Cleanup admits only timestamped directories with matching case manifests. New case directories are exclusively created with mode 0700. Artifact replacement is atomic; `case.json` is published last. A forced rewrite first invalidates its old manifest; write failures are reported.
+Output must be strictly below the repository root. Traversal, prefix-sibling escapes, output symlinks (including dangling ancestors), and symlinked show artifacts are rejected. Cleanup admits only timestamped directories with matching case manifests. New case directories are exclusively created with mode 0700 on POSIX.
+Drive-qualified Windows directories inherit their parent ACL; use a private
+parent directory. CaseFile does not claim POSIX modes or rewrite Windows ACLs. Artifact replacement is atomic; `case.json` is published last. A forced rewrite first invalidates its old manifest; write failures are reported.
 
 These checks do **not** close the time-of-check/time-of-use window against a process concurrently replacing ancestor directories. Forced rewrites are not serialized, and cleanup must not race them. Strong hostile-workspace containment requires descriptor-relative no-follow write/delete operations in the runtime. Keep bundle roots private and serialize forced writes/cleanup.
 
