@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import shutil
+import shlex
 import subprocess
 import tempfile
 import unittest
@@ -52,6 +53,15 @@ class Hardening(unittest.TestCase):
         result = self.run_cli('capture', '--name', 'fixture', '--format', 'json', *args)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         return json.loads(result.stdout)
+
+    def test_directory_failure_exposes_utility_diagnostic(self):
+        helper = self.bin / 'mkdir'
+        real_mkdir = shlex.quote(shutil.which('mkdir'))
+        helper.write_text('#!/bin/sh\nif [ "$1" = "-m" ]; then echo "fixture directory failure" >&2; exit 1; fi\nexec ' + real_mkdir + ' "$@"\n')
+        helper.chmod(0o755)
+        result = self.run_cli('capture', '--manual', '--name', 'directory-error')
+        self.assertEqual(result.returncode, 4)
+        self.assertIn('fixture directory failure', result.stdout + result.stderr)
 
     def test_show_rejects_traversal(self):
         (self.ws / 'case.md').write_text('OUTSIDE SENTINEL')

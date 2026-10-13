@@ -21,3 +21,7 @@ Requirements: Kujo with `write_file_atomic` and `path_is_symlink` support (verif
 - [Security boundaries](SECURITY.md)
 - [Verification and architecture](CONTRIBUTING.md)
 - [Hardening audit](docs/audits/repository-hardening.md)
+
+Drive-qualified paths passed to directory utilities use forward slashes for Git
+for Windows compatibility. Directory-creation failures include the utility error.
+POSIX mode and exclusive-creation behavior are unchanged.
