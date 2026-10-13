@@ -24,4 +24,5 @@ Requirements: Kujo with `write_file_atomic` and `path_is_symlink` support (verif
 
 Drive-qualified paths passed to directory utilities use forward slashes for Git
 for Windows compatibility. Directory-creation failures include the utility error.
-POSIX mode and exclusive-creation behavior are unchanged.
+Exclusive creation is preserved. POSIX uses mode0700; drive-qualified Windows
+paths inherit their parent ACL and require a private parent directory.
