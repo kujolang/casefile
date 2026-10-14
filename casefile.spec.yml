@@ -1,6 +1,6 @@
 name: "CaseFile launch readiness review"
 goal: "Keep CaseFile locally release-ready as a Kujo-native evidence bundle capture and handoff CLI."
-version: "1.0.0"
+version: "1.0.1"
 background: "CaseFile is part of the Kujo prelaunch supporting-tooling matrix. The verified scope is local plaintext evidence capture, redaction-by-default, path-safe output handling, and deterministic review/handoff artifacts."
 scope: "Repository-local CLI behavior in interpreter mode, init/validate/doctor/list/show/capture/clean command contracts, redaction and output-path safety, docs/readiness wording, and launch evidence capture."
 non_goals:

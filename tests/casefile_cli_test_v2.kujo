@@ -5,7 +5,7 @@ test "help output is byte stable" {
 
 	res := spawn_process([kujo_bin, "run", "--interpreter", casefile_script, "--", "help"])
 
-	expected := "CaseFile 1.0.0\n"
+	expected := "CaseFile 1.0.1\n"
 		+ "\n"
 		+ "Usage:\n"
 		+ "  kujo run casefile.kujo -- <command> [options]\n"
