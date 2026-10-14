@@ -1,0 +1,50 @@
+name: CaseFile verification
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+      - name: Install published runtime
+        id: runtime
+        uses: kujolang/kujo/.github/actions/setup-kujo@9fbad956eecd37448d6dc2f3568105cd1da7b0b0
+        with:
+          version: v1.8.1
+      - name: Verify CLI and hardening contracts
+        run: bash scripts/verify.sh
+        env:
+          KUJO_BIN: ${{ steps.runtime.outputs.kujo-path }}
+  native-smoke:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-2025]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 24.11.0
+      - name: Install published runtime
+        id: runtime
+        uses: kujolang/kujo/.github/actions/setup-kujo@9fbad956eecd37448d6dc2f3568105cd1da7b0b0
+        with:
+          version: v1.8.1
+      - name: Exercise native capture workflows
+        shell: bash
+        run: node tests/native-smoke.mjs
+        env:
+          KUJO_BIN: ${{ steps.runtime.outputs.kujo-path }}

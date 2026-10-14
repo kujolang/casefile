@@ -13,6 +13,6 @@ Verification prints a concise receipt and preserves each check’s complete outp
 
 `KUJO_BIN` can point to another compatible runtime. The measurement command uses five deterministic 1 MiB imported-log fixtures with optional collectors disabled and reports raw samples, probe counts, output size, and median latency. Pass an alternate script path to measure an older revision with the identical fixture. Timing is diagnostic, not a flaky CI threshold. Stable regression assertions cover collection counts and bounded output.
 
-The existing GitHub workflow verifies generated-artifact hygiene with a pinned checkout action and read-only permissions. Full runtime verification is available through `scripts/verify.sh` and the portable Eval fixture; hosted execution requires a separately verified Kujo installation. No unverified runtime download was added to CI.
+GitHub CI runs `scripts/verify.sh` on Linux and macOS using the checksum-verified published Kujo 1.8.1 runtime. A separate workflow verifies generated-artifact hygiene. Both use pinned actions and read-only permissions.
 
 Preserve help output, argv execution, exit codes, redaction defaults, JSON field names, and supported configuration. Update FLAGS.md for behavior changes and SECURITY.md for boundary changes. Use local fixtures, never real credentials. Do not read or modify generated `.casefile/` evidence as source.

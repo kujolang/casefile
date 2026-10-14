@@ -5,7 +5,7 @@ test "help output is byte stable" {
 
 	res := spawn_process([kujo_bin, "run", "--interpreter", casefile_script, "--", "help"])
 
-	expected := "CaseFile 1.0.0\n"
+	expected := "CaseFile 1.0.1\n"
 		+ "\n"
 		+ "Usage:\n"
 		+ "  kujo run casefile.kujo -- <command> [options]\n"
@@ -62,13 +62,13 @@ test "capture accepts absolute output_dir inside repo" {
 	kujo_bin_res := spawn_process(["sh", "-lc", "printf '%s' \"$KUJO_BIN\""])
 	kujo_bin := trim(to_string(kujo_bin_res.stdout))
 	casefile_script := path_join(os_getcwd(), "casefile.kujo")
-	ws := "/private/tmp/casefile-test-abs-" + to_string(current_timestamp())
-	custom_root := path_join(ws, "custom-output")
+	ws := "/tmp/casefile-test-abs-" + to_string(current_timestamp())
 	spawn_process(["rm", "-rf", ws])
 	spawn_process(["mkdir", "-p", ws])
 
 	prev := os_getcwd()
 	os_chdir(ws)
+	custom_root := path_join(path_absolute(ws), "custom-output")
 	spawn_process([kujo_bin, "run", "--interpreter", casefile_script, "--", "init"])
 	config_text := "printf 'output_dir = \"%s\"\\n' '" + custom_root + "' > casefile.toml"
 	write_result := spawn_process(["sh", "-lc", config_text])
@@ -87,7 +87,7 @@ test "capture rejects prefix-sibling output_dir" {
 	kujo_bin_res := spawn_process(["sh", "-lc", "printf '%s' \"$KUJO_BIN\""])
 	kujo_bin := trim(to_string(kujo_bin_res.stdout))
 	casefile_script := path_join(os_getcwd(), "casefile.kujo")
-	ws := "/private/tmp/casefile-test-prefix-" + to_string(current_timestamp())
+	ws := "/tmp/casefile-test-prefix-" + to_string(current_timestamp())
 	outside_root := ws + "-outside"
 	spawn_process(["rm", "-rf", ws])
 	spawn_process(["rm", "-rf", outside_root])

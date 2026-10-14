@@ -14,7 +14,7 @@ Run these commands from the repository being investigated, using an absolute pat
 
 Start with `case.md`, `case.json`, and `handoff.md`; consult logs and Git artifacts for details. `case.json` is the completion marker and the machine-readable contract. Capture returns 0 after successfully recording a failed command; use `--mirror-exit-code` to preserve its status.
 
-Requirements: Kujo with `write_file_atomic` and `path_is_symlink` support (verified with the installed `kujo 1.0.0`), Git, and POSIX utilities (`mkdir`, `date`, `head`, `rm`, `uname`). Python 3 is only used for tests and measurements. No package installation or network access is required by CaseFile itself. Tool version probes run installed executables from PATH, which must be trusted.
+Requirements: Kujo with `write_file_atomic` and `path_is_symlink` support (release verification uses published Kujo 1.8.1), Git, and POSIX utilities (`mkdir`, `date`, `head`, `rm`, `uname`). Python 3 is only used for tests and measurements. No package installation or network access is required by CaseFile itself. Tool version probes run installed executables from PATH, which must be trusted.
 
 - [Flags and configuration](FLAGS.md)
 - [Workflows](HOWTO.md)
@@ -24,5 +24,5 @@ Requirements: Kujo with `write_file_atomic` and `path_is_symlink` support (verif
 
 Drive-qualified and extended-length paths passed to file utilities use forward slashes for Git
 for Windows compatibility. Directory-creation failures include the utility error.
-Exclusive creation is preserved. POSIX uses mode0700; drive-qualified Windows
+Exclusive creation is preserved. POSIX uses mode 0700; drive-qualified Windows
 paths inherit their parent ACL and require a private parent directory.

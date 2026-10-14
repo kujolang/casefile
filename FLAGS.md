@@ -36,4 +36,4 @@ Exit codes: 0 for successful processing, 2 for usage/configuration errors, 4 for
 `[redaction].patterns` is an array of valid regex strings extending mandatory defaults; duplicates are removed. Patterns cannot disable default protection. `[paths].include_globs`/`exclude_globs` are string arrays reserved for compatibility. Boolean and numeric fields are type checked before capture writes anything.
 
 On drive-qualified Windows paths, newly created case directories inherit the
-parent ACL. Use a private output root. POSIX directory mode remains0700.
+parent ACL. Use a private output root. POSIX directory mode remains 0700.
