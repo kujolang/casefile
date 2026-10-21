@@ -20,7 +20,7 @@ try {
   const imported = JSON.parse(run('capture', '--name', 'imported', '--from-log', join(root, 'input log.txt'), '--format', 'json'));
   assert.equal(imported.logs.truncated, false);
   const shown = run('show', 'latest', '--format', 'json');
-  assert.equal(JSON.parse(shown).version, '1.0.1');
+  assert.equal(JSON.parse(shown).version, '1.0.2');
   assert.ok(!shown.includes('synthetic-private-value'));
   run('capture', '--manual', '--name', 'manual');
   run('capture', '--name', 'command', '--', process.execPath, '-e', 'process.exit(1)');

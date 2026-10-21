@@ -1,6 +1,9 @@
 # Changelog
 
-## [Unreleased]
+## [1.0.2] - 2026-10-21
+
+- Require patched Node.js for JavaScript smoke checks and CI tooling.
+- Preserve the existing local capture, redaction, bundle, and cleanup contracts.
 
 ## [1.0.1] - 2026-10-14
 
