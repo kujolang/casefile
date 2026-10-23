@@ -6,7 +6,7 @@
       "name": "CaseFile help succeeds",
       "check": "command_succeeds",
       "params": {
-        "command": "kujo run --interpreter casefile.kujo -- help"
+        "command": "kujo run casefile.kujo -- help"
       }
     },
     {
@@ -20,7 +20,7 @@
       "name": "CaseFile unsupported version flag exits 2",
       "check": "exit_code_equals",
       "params": {
-        "command": "kujo run --interpreter casefile.kujo -- --version",
+        "command": "kujo run casefile.kujo -- --version",
         "expected": 2
       }
     },

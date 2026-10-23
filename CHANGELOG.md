@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+- Add the source `kennel.toml` with package metadata, CLI export, and Kujo 1.8.1 minimum runtime.
+- Use the default Kujo VM in command examples and CLI verification; `--interpreter` remains optional.
+- Match the ecosystem's monochrome version, license, and built-with-Kujo badges.
+
 ## [1.0.2] - 2026-10-21
 
 - Require patched Node.js for JavaScript smoke checks and CI tooling.

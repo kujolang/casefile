@@ -11,6 +11,8 @@ python3 tests/measure_capture.py
 
 Verification prints a concise receipt and preserves each check’s complete output in the reported temporary evidence directory. A failed check returns its exit status and the last 40 log lines.
 
+CLI examples and regression tests use the default Kujo VM without `--interpreter`. Keep this path covered when changing runtime requirements. Keep the package version and CLI entry in `kennel.toml` aligned with `casefile.kujo` and the README version badge.
+
 `KUJO_BIN` can point to another compatible runtime. The measurement command uses five deterministic 1 MiB imported-log fixtures with optional collectors disabled and reports raw samples, probe counts, output size, and median latency. Pass an alternate script path to measure an older revision with the identical fixture. Timing is diagnostic, not a flaky CI threshold. Stable regression assertions cover collection counts and bounded output.
 
 GitHub CI runs `scripts/verify.sh` on Linux and macOS using the checksum-verified published Kujo 1.8.1 runtime. A separate workflow verifies generated-artifact hygiene. Both use pinned actions and read-only permissions.

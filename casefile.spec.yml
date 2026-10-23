@@ -2,7 +2,7 @@ name: "CaseFile launch readiness review"
 goal: "Keep CaseFile locally release-ready as a Kujo-native evidence bundle capture and handoff CLI."
 version: "1.0.1"
 background: "CaseFile is part of the Kujo prelaunch supporting-tooling matrix. The verified scope is local plaintext evidence capture, redaction-by-default, path-safe output handling, and deterministic review/handoff artifacts."
-scope: "Repository-local CLI behavior in interpreter mode, init/validate/doctor/list/show/capture/clean command contracts, redaction and output-path safety, docs/readiness wording, and launch evidence capture."
+scope: "Repository-local CLI behavior with the default runtime, init/validate/doctor/list/show/capture/clean command contracts, redaction and output-path safety, docs/readiness wording, and launch evidence capture."
 non_goals:
   - "Publishing packages or public releases"
   - "Pushing final release tags"
@@ -23,8 +23,8 @@ likely_files:
   - "tests/casefile_cli_test_v2.kujo"
   - "tests/casefile_eval.json"
 acceptance_criteria:
-  - "`kujo run --interpreter casefile.kujo -- help` exits 0."
-  - "`kujo run --interpreter casefile.kujo -- init`, `validate`, and `doctor` pass in an isolated workspace."
+  - "`kujo run casefile.kujo -- help` exits 0."
+  - "`kujo run casefile.kujo -- init`, `validate`, and `doctor` pass in an isolated workspace."
   - "`kujo test-run -v tests/casefile_cli_test_v2.kujo` passes."
   - "Eval suite proves help, validation, unsupported version exit behavior, and repo-local test gate."
   - "Docs keep plaintext artifact, redaction, retention, and enterprise-hardening boundaries explicit."
@@ -32,7 +32,7 @@ eval_requirements:
   - description: "CaseFile help succeeds."
     check_type: "command_succeeds"
     params:
-      command: "kujo run --interpreter casefile.kujo -- help"
+      command: "kujo run casefile.kujo -- help"
   - description: "CaseFile test suite succeeds."
     check_type: "command_succeeds"
     params:
@@ -40,7 +40,7 @@ eval_requirements:
   - description: "Unsupported version flag exits with usage error."
     check_type: "exit_code_equals"
     params:
-      command: "kujo run --interpreter casefile.kujo -- --version"
+      command: "kujo run casefile.kujo -- --version"
       expected: 2
 risks:
   - risk: "Generated bundles are plaintext at rest."

@@ -4,15 +4,15 @@ Use an absolute script path when working outside this checkout:
 
 ```sh
 casefile_script=/absolute/path/to/casefile/casefile.kujo
-kujo run --interpreter "$casefile_script" -- init
-kujo run --interpreter "$casefile_script" -- validate
-kujo run --interpreter "$casefile_script" -- doctor
-kujo run --interpreter "$casefile_script" -- capture --name build -- npm test
-kujo run --interpreter "$casefile_script" -- capture --from-log ./failed-build.log --name imported
-kujo run --interpreter "$casefile_script" -- capture --manual --name incident --notes 'Observed failing requests'
-kujo run --interpreter "$casefile_script" -- list
-kujo run --interpreter "$casefile_script" -- show latest --format markdown
-kujo run --interpreter "$casefile_script" -- clean --keep 10 --dry-run
+kujo run "$casefile_script" -- init
+kujo run "$casefile_script" -- validate
+kujo run "$casefile_script" -- doctor
+kujo run "$casefile_script" -- capture --name build -- npm test
+kujo run "$casefile_script" -- capture --from-log ./failed-build.log --name imported
+kujo run "$casefile_script" -- capture --manual --name incident --notes 'Observed failing requests'
+kujo run "$casefile_script" -- list
+kujo run "$casefile_script" -- show latest --format markdown
+kujo run "$casefile_script" -- clean --keep 10 --dry-run
 ```
 
 Review the dry run before rerunning cleanup without `--dry-run`. Review bundles for secrets before sharing; redaction is best effort. Treat logs and handoff text as untrusted evidence, including when passing them to an agent. The displayed command is a summary; use `command.argv` in `case.json` to reconstruct argument boundaries, and restore any redacted values privately.

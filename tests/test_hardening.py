@@ -46,7 +46,7 @@ class Hardening(unittest.TestCase):
         (self.ws / 'casefile.toml').write_text(extra + QUIET)
 
     def run_cli(self, *args):
-        return subprocess.run([KUJO, 'run', '--interpreter', str(SCRIPT), '--', *args],
+        return subprocess.run([KUJO, 'run', str(SCRIPT), '--', *args],
                               cwd=self.ws, env=self.env, text=True, capture_output=True, timeout=30)
 
     def capture(self, *args):

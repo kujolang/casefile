@@ -7,7 +7,7 @@ import { spawnSync } from 'node:child_process';
 const script = resolve('casefile.kujo');
 const root = mkdtempSync(join(tmpdir(), 'casefile native space-'));
 function run(...args) {
-  const result = spawnSync(process.env.KUJO_BIN || 'kujo', ['run', '--interpreter', script, '--', ...args], { cwd: root, encoding: 'utf8', timeout: 30000 });
+  const result = spawnSync(process.env.KUJO_BIN || 'kujo', ['run', script, '--', ...args], { cwd: root, encoding: 'utf8', timeout: 30000 });
   assert.equal(result.status, 0, result.stderr + result.stdout);
   return result.stdout;
 }

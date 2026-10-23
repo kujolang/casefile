@@ -1,6 +1,6 @@
 # CLI contract
 
-Invoke `kujo run --interpreter /path/to/casefile.kujo -- COMMAND`.
+Invoke `kujo run /path/to/casefile.kujo -- COMMAND`.
 
 | Command | Arguments |
 | --- | --- |

@@ -16,7 +16,7 @@ run_check() {
     return "$status"
   fi
 }
-run_check help "$KUJO_BIN" run --interpreter casefile.kujo -- help
+run_check help "$KUJO_BIN" run casefile.kujo -- help
 run_check check "$KUJO_BIN" check casefile.kujo
 run_check lint "$KUJO_BIN" lint casefile.kujo
 run_check cli "$KUJO_BIN" test-run -v tests/casefile_cli_test_v2.kujo

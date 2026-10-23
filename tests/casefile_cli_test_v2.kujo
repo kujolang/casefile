@@ -3,7 +3,7 @@ test "help output is byte stable" {
 	kujo_bin := trim(to_string(kujo_bin_res.stdout))
 	casefile_script := path_join(os_getcwd(), "casefile.kujo")
 
-	res := spawn_process([kujo_bin, "run", "--interpreter", casefile_script, "--", "help"])
+	res := spawn_process([kujo_bin, "run", casefile_script, "--", "help"])
 
 	expected := "CaseFile 1.0.2\n"
 		+ "\n"
@@ -33,7 +33,7 @@ test "init creates casefile.toml" {
 
 	prev := os_getcwd()
 	os_chdir(ws)
-	res := spawn_process([kujo_bin, "run", "--interpreter", casefile_script, "--", "init"])
+	res := spawn_process([kujo_bin, "run", casefile_script, "--", "init"])
 	os_chdir(prev)
 
 	assert_equal(to_int(res.exitcode), 0)
@@ -50,8 +50,8 @@ test "validate passes after init" {
 
 	prev := os_getcwd()
 	os_chdir(ws)
-	spawn_process([kujo_bin, "run", "--interpreter", casefile_script, "--", "init"])
-	res := spawn_process([kujo_bin, "run", "--interpreter", casefile_script, "--", "validate"])
+	spawn_process([kujo_bin, "run", casefile_script, "--", "init"])
+	res := spawn_process([kujo_bin, "run", casefile_script, "--", "validate"])
 	os_chdir(prev)
 
 	assert_equal(to_int(res.exitcode), 0)
@@ -69,11 +69,11 @@ test "capture accepts absolute output_dir inside repo" {
 	prev := os_getcwd()
 	os_chdir(ws)
 	custom_root := path_join(path_absolute(ws), "custom-output")
-	spawn_process([kujo_bin, "run", "--interpreter", casefile_script, "--", "init"])
+	spawn_process([kujo_bin, "run", casefile_script, "--", "init"])
 	config_text := "printf 'output_dir = \"%s\"\\n' '" + custom_root + "' > casefile.toml"
 	write_result := spawn_process(["sh", "-lc", config_text])
 	assert_equal(to_int(write_result.exitcode), 0)
-	res := spawn_process([kujo_bin, "run", "--interpreter", casefile_script, "--", "capture", "--manual", "--name", "abs"])
+	res := spawn_process([kujo_bin, "run", casefile_script, "--", "capture", "--manual", "--name", "abs"])
 	os_chdir(prev)
 
 	assert_equal(to_int(res.exitcode), 0)
@@ -95,11 +95,11 @@ test "capture rejects prefix-sibling output_dir" {
 
 	prev := os_getcwd()
 	os_chdir(ws)
-	spawn_process([kujo_bin, "run", "--interpreter", casefile_script, "--", "init"])
+	spawn_process([kujo_bin, "run", casefile_script, "--", "init"])
 	config_text := "printf 'output_dir = \"%s\"\\n' '" + outside_root + "' > casefile.toml"
 	write_result := spawn_process(["sh", "-lc", config_text])
 	assert_equal(to_int(write_result.exitcode), 0)
-	res := spawn_process([kujo_bin, "run", "--interpreter", casefile_script, "--", "capture", "--manual", "--name", "prefix"])
+	res := spawn_process([kujo_bin, "run", casefile_script, "--", "capture", "--manual", "--name", "prefix"])
 	os_chdir(prev)
 
 	assert_equal(to_int(res.exitcode), 4)
@@ -117,11 +117,11 @@ test "validate rejects traversal output_dir" {
 
 	prev := os_getcwd()
 	os_chdir(ws)
-	spawn_process([kujo_bin, "run", "--interpreter", casefile_script, "--", "init"])
+	spawn_process([kujo_bin, "run", casefile_script, "--", "init"])
 	config_text := "printf 'output_dir = \"%s\"\\n' '../casefile-outside' > casefile.toml"
 	write_result := spawn_process(["sh", "-lc", config_text])
 	assert_equal(to_int(write_result.exitcode), 0)
-	res := spawn_process([kujo_bin, "run", "--interpreter", casefile_script, "--", "validate"])
+	res := spawn_process([kujo_bin, "run", casefile_script, "--", "validate"])
 	os_chdir(prev)
 
 	assert_equal(to_int(res.exitcode), 2)
@@ -138,8 +138,8 @@ test "capture command writes case artifacts" {
 
 	prev := os_getcwd()
 	os_chdir(ws)
-	spawn_process([kujo_bin, "run", "--interpreter", casefile_script, "--", "init"])
-	res := spawn_process([kujo_bin, "run", "--interpreter", casefile_script, "--", "capture", "--name", "cmd", "--", "false"])
+	spawn_process([kujo_bin, "run", casefile_script, "--", "init"])
+	res := spawn_process([kujo_bin, "run", casefile_script, "--", "capture", "--name", "cmd", "--", "false"])
 	os_chdir(prev)
 
 	assert_equal(to_int(res.exitcode), 0)
@@ -172,8 +172,8 @@ test "mirror exit code returns failing command status" {
 
 	prev := os_getcwd()
 	os_chdir(ws)
-	spawn_process([kujo_bin, "run", "--interpreter", casefile_script, "--", "init"])
-	res := spawn_process([kujo_bin, "run", "--interpreter", casefile_script, "--", "capture", "--name", "mirror", "--mirror-exit-code", "--", "false"])
+	spawn_process([kujo_bin, "run", casefile_script, "--", "init"])
+	res := spawn_process([kujo_bin, "run", casefile_script, "--", "capture", "--name", "mirror", "--mirror-exit-code", "--", "false"])
 	os_chdir(prev)
 
 	assert_equal(to_int(res.exitcode), 1)
@@ -189,10 +189,10 @@ test "list and show latest commands work" {
 
 	prev := os_getcwd()
 	os_chdir(ws)
-	spawn_process([kujo_bin, "run", "--interpreter", casefile_script, "--", "init"])
-	spawn_process([kujo_bin, "run", "--interpreter", casefile_script, "--", "capture", "--manual", "--name", "alpha"])
-	list_res := spawn_process([kujo_bin, "run", "--interpreter", casefile_script, "--", "list"])
-	show_res := spawn_process([kujo_bin, "run", "--interpreter", casefile_script, "--", "show", "latest", "--format", "json"])
+	spawn_process([kujo_bin, "run", casefile_script, "--", "init"])
+	spawn_process([kujo_bin, "run", casefile_script, "--", "capture", "--manual", "--name", "alpha"])
+	list_res := spawn_process([kujo_bin, "run", casefile_script, "--", "list"])
+	show_res := spawn_process([kujo_bin, "run", casefile_script, "--", "show", "latest", "--format", "json"])
 	os_chdir(prev)
 
 	assert_equal(to_int(list_res.exitcode), 0)
@@ -212,11 +212,11 @@ test "clean dry-run reports deletions" {
 
 	prev := os_getcwd()
 	os_chdir(ws)
-	spawn_process([kujo_bin, "run", "--interpreter", casefile_script, "--", "init"])
-	spawn_process([kujo_bin, "run", "--interpreter", casefile_script, "--", "capture", "--manual", "--name", "one"])
-	spawn_process([kujo_bin, "run", "--interpreter", casefile_script, "--", "capture", "--manual", "--name", "two"])
-	spawn_process([kujo_bin, "run", "--interpreter", casefile_script, "--", "capture", "--manual", "--name", "three"])
-	clean_res := spawn_process([kujo_bin, "run", "--interpreter", casefile_script, "--", "clean", "--keep", "1", "--dry-run"])
+	spawn_process([kujo_bin, "run", casefile_script, "--", "init"])
+	spawn_process([kujo_bin, "run", casefile_script, "--", "capture", "--manual", "--name", "one"])
+	spawn_process([kujo_bin, "run", casefile_script, "--", "capture", "--manual", "--name", "two"])
+	spawn_process([kujo_bin, "run", casefile_script, "--", "capture", "--manual", "--name", "three"])
+	clean_res := spawn_process([kujo_bin, "run", casefile_script, "--", "clean", "--keep", "1", "--dry-run"])
 	os_chdir(prev)
 
 	assert_equal(to_int(clean_res.exitcode), 0)
@@ -233,11 +233,10 @@ test "capture redacts command arguments logs and notes" {
 
 	prev := os_getcwd()
 	os_chdir(ws)
-	spawn_process([kujo_bin, "run", "--interpreter", casefile_script, "--", "init"])
+	spawn_process([kujo_bin, "run", casefile_script, "--", "init"])
 	res := spawn_process([
 		kujo_bin,
 		"run",
-		"--interpreter",
 		casefile_script,
 		"--",
 		"capture",
