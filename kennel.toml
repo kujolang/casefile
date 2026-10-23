@@ -1,0 +1,33 @@
+[package]
+name = "casefile"
+version = "1.0.2"
+description = "Turn command results, existing logs, and manual notes into local debugging bundles."
+license = "MIT"
+authors = ["Kujolang <contact@kujolang.ai>"]
+repository = "https://github.com/kujolang/casefile"
+documentation = "https://github.com/kujolang/casefile/blob/main/HOWTO.md"
+keywords = ["kujo", "debugging", "evidence", "developer-tools"]
+categories = ["developer-tools"]
+readme = "README.md"
+
+[package.status]
+stage = "production"
+stability = "stable"
+public_api = true
+notes = "Local plaintext evidence capture; redaction is best effort. See SECURITY.md for trust boundaries."
+
+[package.exports]
+cli = "casefile.kujo"
+
+[kujo]
+minimum_version = "1.8.1"
+entry = "casefile.kujo"
+sources = ["."]
+includes = ["README.md", "LICENSE", "CHANGELOG.md", "HOWTO.md", "FLAGS.md", "SECURITY.md", "CONTRIBUTING.md", "docs", "tests", "scripts"]
+excludes = [".git", ".casefile", "kennel_packages", ".kennel_tmp", "dist", "build", "node_modules", "__pycache__"]
+
+[dependencies]
+
+[scripts]
+test = "kujo test-run -v tests/casefile_cli_test_v2.kujo"
+verify = "bash scripts/verify.sh"
