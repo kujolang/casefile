@@ -58,6 +58,20 @@ func safe_to_string(value) {
 	}
 }
 
+func terminal_text(value) {
+	return regex_replace(safe_to_string(value), "[\\x00-\\x08\\x0B-\\x1F\\x7F-\\x9F]", "")
+}
+
+func fenced_evidence(value, language) {
+	text := terminal_text(value)
+	width := 3
+	for run in regex_find_all(text, "`+") {
+		if len(run) >= width { width = len(run) + 1 }
+	}
+	fence := repeat("`", width)
+	return fence + language + "\n" + text + "\n" + fence + "\n\n"
+}
+
 func print_lines(lines) {
 	for line in lines {
 		print(line)
@@ -66,16 +80,16 @@ func print_lines(lines) {
 
 func print_kv_lines(prefix, pairs) {
 	for pair in pairs {
-		print(prefix + safe_to_string(pair[0]) + ": " + safe_to_string(pair[1]))
+		print(terminal_text(prefix + safe_to_string(pair[0]) + ": " + safe_to_string(pair[1])))
 	}
 }
 
 func print_capture_error(message) {
-	print("capture error: " + safe_to_string(message))
+	print("capture error: " + terminal_text(message))
 }
 
 func print_validation_error(message) {
-	print("Validation failed: " + safe_to_string(message))
+	print("Validation failed: " + terminal_text(message))
 }
 
 func is_truthy(value) {
@@ -1469,7 +1483,7 @@ func render_reproduction(capture_data) {
 	}
 	return "# Reproduction Steps\n\n"
 		+ "## Command\n\n"
-		+ "```bash\n" + safe_to_string(capture_data["display"]) + "\n```\n\n"
+		+ fenced_evidence(capture_data["display"], "bash")
 		+ "## Steps\n\n"
 		+ "1. Navigate to the repository root.\n"
 		+ "2. Run the command above.\n"
@@ -1493,7 +1507,7 @@ func render_handoff(capture_data, classification, git_ctx) {
 
 	return "You are debugging a local failure captured by CaseFile.\n\n"
 		+ "Failure summary:\n"
-		+ "- Command: " + safe_to_string(capture_data["display"]) + "\n"
+		+ "\nCaptured command\n\n" + fenced_evidence(capture_data["display"], "text")
 		+ "- Exit code: " + safe_to_string(capture_data["exit_code"]) + "\n"
 		+ "- Main failing area: review failure keywords and git context\n"
 		+ changed_line
@@ -1544,7 +1558,7 @@ func render_case_markdown(case_id, case_path, options, capture_data, git_ctx, en
 
 	notes_section := ""
 	if len(trim(options["notes"])) > 0 {
-		notes_section = safe_to_string(options["notes"]) + "\n\n"
+		notes_section = "### Notes\n\n" + fenced_evidence(options["notes"], "text")
 	}
 
 	return "# CaseFile: " + safe_to_string(case_id) + "\n\n"
@@ -1552,7 +1566,7 @@ func render_case_markdown(case_id, case_path, options, capture_data, git_ctx, en
 		+ notes_section
 		+ "Case captured in **" + safe_to_string(capture_data["mode"]) + "** mode with status **" + safe_to_string(classification["status"]) + "** and severity **" + safe_to_string(classification["severity"]) + "**.\n\n"
 		+ "## Command\n\n"
-		+ "```\n" + safe_to_string(capture_data["display"]) + "\n```\n\n"
+		+ fenced_evidence(capture_data["display"], "")
 		+ "## Result\n\n"
 		+ "- Exit code: " + exit_value + "\n"
 		+ "- Duration: " + to_string(capture_data["duration_ms"]) + "ms\n"
@@ -1668,7 +1682,7 @@ func output_capture_summary(case_id, case_path, capture_data, classification) {
 	]
 	step_no := 1
 	for step in steps {
-		print(to_string(step_no) + ". " + step)
+		print(terminal_text(to_string(step_no) + ". " + step))
 		step_no = step_no + 1
 	}
 }
@@ -1784,9 +1798,9 @@ func capture_command_handler(subargs) {
 	recommendations := build_recommendations(capture_result, git_ctx, env_data)
 	case_json_obj := build_case_json(VERSION, case_id, case_path, options, capture_result, git_ctx, env_data, classification, recommendations)
 
-	case_markdown := render_case_markdown(case_id, case_path, options, capture_result, git_ctx, env_data, classification, recommendations)
-	reproduction_markdown := render_reproduction(capture_result)
-	handoff_markdown := render_handoff(capture_result, classification, git_ctx)
+	case_markdown := terminal_text(render_case_markdown(case_id, case_path, options, capture_result, git_ctx, env_data, classification, recommendations))
+	reproduction_markdown := terminal_text(render_reproduction(capture_result))
+	handoff_markdown := terminal_text(render_handoff(capture_result, classification, git_ctx))
 
 	artifact_write := require_writes([
 		[path_join(case_path, "case.md"), case_markdown],
@@ -2036,9 +2050,11 @@ func parse_show_options(subargs) {
 	return {"ok": true, "options": options}
 }
 
-func print_case_artifact(path_value) {
+func print_case_artifact(path_value, human_view) {
 	try {
-		print(read_file(path_value))
+		text := read_file(path_value)
+		if human_view { text = terminal_text(text) }
+		print(text)
 	} except err {
 		print("Failed to read case artifact: " + safe_to_string(err))
 		exit(4)
@@ -2091,7 +2107,7 @@ func show_command_handler(subargs) {
 			print("case.json not found for case: " + case_id)
 			exit(2)
 		}
-		print_case_artifact(json_path)
+		print_case_artifact(json_path, false)
 		exit(0)
 	}
 
@@ -2100,7 +2116,7 @@ func show_command_handler(subargs) {
 		print("case.md not found for case: " + case_id)
 		exit(2)
 	}
-	print_case_artifact(md_path)
+	print_case_artifact(md_path, true)
 	exit(0)
 }
 

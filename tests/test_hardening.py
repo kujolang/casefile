@@ -236,6 +236,26 @@ class Hardening(unittest.TestCase):
         self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
         self.assertNotIn('SYNTHETICNAME', r.stdout)
 
+    def test_rendered_evidence_keeps_controls_inert_and_quotes_fences(self):
+        note = 'Progress\x07\n' + chr(96) * 3 + '\nliteral example'
+        displayed = 'argument with ' + chr(96) * 3 + ' and \x1b control'
+        data = self.capture('--notes', note, '--', 'printf', '%s', displayed)
+        bundle = Path(data['case']['path'])
+        self.assertEqual(data['command']['argv'][-1], displayed)
+        self.assertIn('\x1b', (bundle / 'stdout.log').read_text())
+        self.assertIn('literal example', (bundle / 'case.md').read_text())
+        fence = chr(96) * 4
+        for name in ('case.md', 'handoff.md', 'reproduction.md'):
+            rendered = (bundle / name).read_text()
+            self.assertIn(fence, rendered)
+            self.assertNotIn('\x1b', rendered)
+            self.assertNotIn('\x07', rendered)
+        (bundle / 'case.md').write_text('legacy display\x07\n')
+        result = self.run_cli('show', data['case']['id'])
+        self.assertEqual(result.returncode, 0)
+        self.assertIn('legacy display\n', result.stdout)
+        self.assertNotIn('\x07', result.stdout)
+
     def test_unreadable_artifact_has_controlled_exit(self):
         data = self.capture('--manual')
         (Path(data['case']['path']) / 'case.md').write_bytes(b'\xff')
