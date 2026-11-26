@@ -1927,28 +1927,31 @@ func doctor_command_handler() {
 	exit(0)
 }
 
-func sort_case_ids(values) {
-	return sort(clone_array(values))
-}
-
-func list_case_dirs(output_root) {
+func candidate_case_ids(output_root) {
 	if !is_truthy(path_exists(output_root)) || !is_truthy(path_is_dir(output_root)) {
 		return []
 	}
-	entries := list_dir(output_root)
 	dirs := []
-	for entry in entries {
+	for entry in list_dir(output_root) {
 		full_path := path_join(output_root, entry)
-		if regex_match(entry, "^[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{6}-.+$") && !is_symlink(full_path) && is_truthy(path_is_dir(full_path)) && !is_symlink(path_join(full_path, "case.json")) && read_case_json(full_path) != null {
+		if regex_match(entry, "^[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{6}-.+$") && !is_symlink(full_path) && is_truthy(path_is_dir(full_path)) {
 			dirs = push(dirs, entry)
 		}
 	}
-	return sort_case_ids(dirs)
+	return sort(dirs)
+}
+
+func list_case_dirs(output_root) {
+	dirs := []
+	for id in candidate_case_ids(output_root) {
+		if read_case_json(path_join(output_root, id)) != null { dirs = push(dirs, id) }
+	}
+	return dirs
 }
 
 func read_case_json(case_dir) {
 	json_path := path_join(case_dir, "case.json")
-	if !is_truthy(file_exists(json_path)) {
+	if is_symlink(json_path) || !is_truthy(path_is_file(json_path)) {
 		return null
 	}
 	try {
@@ -1977,39 +1980,31 @@ func list_command_handler() {
 		exit(2)
 	}
 	output_root := out_result["path"]
-	case_dirs := list_case_dirs(output_root)
-
-	if len(case_dirs) == 0 {
-		print("No cases found in " + safe_to_string(output_root))
-		exit(0)
-	}
-
-	print_lines([
-		"Case ID | Name | Exit | Severity | Path",
-		"----------------------------------------"
-	])
-	for case_id in case_dirs {
+	printed_header := false
+	for case_id in candidate_case_ids(output_root) {
 		case_path := path_join(output_root, case_id)
 		case_json := read_case_json(case_path)
+		if case_json == null { continue }
+		if !printed_header {
+			print_lines([
+				"Case ID | Name | Exit | Severity | Path",
+				"----------------------------------------"
+			])
+			printed_header = true
+		}
 		name := case_id
 		exit_code := "N/A"
 		severity := "unknown"
-		if case_json != null {
-			if dict_has_key(case_json, "case") && dict_has_key(case_json["case"], "name") {
-				name = safe_to_string(case_json["case"]["name"])
-			}
-			if dict_has_key(case_json, "command") && dict_has_key(case_json["command"], "exit_code") {
-				exit_code = safe_to_string(case_json["command"]["exit_code"])
-			}
-			if dict_has_key(case_json, "classification") && dict_has_key(case_json["classification"], "severity") {
-				severity = safe_to_string(case_json["classification"]["severity"])
-			}
+		if dict_has_key(case_json["case"], "name") { name = safe_to_string(case_json["case"]["name"]) }
+		if dict_has_key(case_json, "command") && dict_has_key(case_json["command"], "exit_code") {
+			exit_code = safe_to_string(case_json["command"]["exit_code"])
 		}
-		line := safe_to_string(case_id) + " | " + safe_to_string(name)
-		line = line + " | " + safe_to_string(exit_code) + " | " + safe_to_string(severity)
-		line = line + " | " + safe_to_string(case_path)
-		print(line)
+		if dict_has_key(case_json, "classification") && dict_has_key(case_json["classification"], "severity") {
+			severity = safe_to_string(case_json["classification"]["severity"])
+		}
+		print(terminal_text(case_id + " | " + name + " | " + exit_code + " | " + severity + " | " + case_path))
 	}
+	if !printed_header { print("No cases found in " + terminal_text(output_root)) }
 	exit(0)
 }
 
@@ -2017,11 +2012,14 @@ func resolve_case_id(requested_case_id, output_root) {
 	if requested_case_id != "latest" {
 		return requested_case_id
 	}
-	case_dirs := list_case_dirs(output_root)
-	if len(case_dirs) == 0 {
-		return null
+	case_dirs := candidate_case_ids(output_root)
+	i := len(case_dirs) - 1
+	while i >= 0 {
+		id := case_dirs[i]
+		if read_case_json(path_join(output_root, id)) != null { return id }
+		i = i - 1
 	}
-	return case_dirs[len(case_dirs) - 1]
+	return null
 }
 
 func parse_show_options(subargs) {
