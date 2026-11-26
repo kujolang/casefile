@@ -207,7 +207,7 @@ class Hardening(unittest.TestCase):
         self.fixed_date()
         with ThreadPoolExecutor(max_workers=2) as pool:
             results = list(pool.map(lambda _: self.run_cli('capture', '--name', 'fixture', '--manual'), range(2)))
-        self.assertEqual(sorted(r.returncode for r in results), [0, 4])
+        self.assertEqual(sorted(r.returncode for r in results), [0, 4], [(r.stdout, r.stderr) for r in results])
 
     def test_force_replaces_symlink_without_writing_target(self):
         self.fixed_date()

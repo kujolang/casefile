@@ -606,7 +606,7 @@ func require_writes(file_pairs) {
 }
 
 func now_case_stamp() {
-	probe := safe_spawn_with_options(["date", "+%Y-%m-%d-%H%M%S"], {"timeout_ms": 2000, "max_output_bytes": 128})
+	probe := safe_spawn(["date", "+%Y-%m-%d-%H%M%S"])
 	if proc_success(probe) && proc_exitcode(probe) == 0 {
 		stamp := trim(proc_stdout(probe))
 		if regex_match(stamp, "^[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{6}$") { return stamp }
