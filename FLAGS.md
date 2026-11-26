@@ -19,9 +19,9 @@ Capture flags: `--name TEXT`, `--output-dir PATH`, `--format human|markdown|json
 
 `--force` permits replacing an existing same-second/name bundle. It invalidates the previous manifest, refreshes mode-specific logs, and atomically replaces individual artifacts. Serialize forced captures and cleanup. It is not a multi-file transaction or a concurrency lock.
 
-`--max-log-bytes` and `max_log_bytes` accept 0–16777216. Command capture bounds each stream; `combined.log` joins stdout then stderr, not chronological interleaving. Log import bounds source bytes. UTF-8 decoding and redaction may change the stored byte length. A zero limit still executes the command and records whether output was discarded. Truncation is explicit in `logs.truncated`.
+`--max-log-bytes` and `max_log_bytes` accept 0–16777216. Command capture bounds each stream; `combined.log` joins stdout then stderr, not chronological interleaving. Log import checks for a regular file before changing the bundle and bounds source bytes. UTF-8 decoding and redaction may change the stored byte length. A zero command limit still executes the command and records whether output was discarded. A zero log-import limit records an empty artifact without launching the file reader. Truncation is explicit in `logs.truncated`.
 
-Cleanup combines `--keep` and `--older-than` with **union** semantics: either criterion selects a case. No criteria means no deletion. Invalid, incomplete, unrelated, or symlinked case directories are skipped. Failed deletions return 4. Age comparisons use timestamped local-time IDs.
+Cleanup combines `--keep` and `--older-than` with **union** semantics: either criterion selects a case. No criteria means no deletion. Invalid, incomplete, unrelated, or symlinked case directories are skipped. Failed deletions return 4. Age comparisons use timestamped local-time IDs. Capture uses the runtime UTC timestamp if the local timestamp utility fails or produces an invalid ID stamp.
 
 Exit codes: 0 for successful processing, 2 for usage/configuration errors, 4 for capture/write/cleanup failures, or the command status with `--mirror-exit-code`. `--version` remains unsupported and exits 2.
 

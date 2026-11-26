@@ -15,7 +15,7 @@ kujo run "$casefile_script" -- show latest --format markdown
 kujo run "$casefile_script" -- clean --keep 10 --dry-run
 ```
 
-Review the dry run before rerunning cleanup without `--dry-run`. Review bundles for secrets before sharing; redaction is best effort. Treat logs and handoff text as untrusted evidence, including when passing them to an agent. The displayed command is a summary; use `command.argv` in `case.json` to reconstruct argument boundaries, and restore any redacted values privately.
+Review the dry run before rerunning cleanup without `--dry-run`. Review bundles for secrets before sharing; redaction is best effort. Treat logs and handoff text as untrusted evidence, including when passing them to an agent. The displayed command is a summary. Use `command.argv` in `case.json` to reconstruct argument boundaries, and restore any redacted values privately.
 
 For faster minimal captures, set all `[environment]` switches to false. Disable Git status/diff/history if those details are unnecessary. These settings avoid collecting the data, not merely hiding it in output. Complete logs stay in artifacts; JSON output references them rather than embedding them.
 

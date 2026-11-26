@@ -16,7 +16,7 @@ kujo run casefile.kujo -- show latest --format json
 
 Run these commands from the repository being investigated, using an absolute path to `casefile.kujo` when it lives elsewhere. Config is loaded from the current directory; output is rooted at the Git top level, or the current directory outside Git. Captured commands inherit the current directory and environment.
 
-Start with `case.md`, `case.json`, and `handoff.md`; consult logs and Git artifacts for details. `case.json` is the completion marker and the machine-readable contract. Capture returns 0 after successfully recording a failed command; use `--mirror-exit-code` to preserve its status.
+Start with `case.md`, `case.json`, and `handoff.md`. Consult logs and Git artifacts for details. Use `show latest` to find the newest completed bundle. `case.json` is the completion marker and the machine-readable contract. Capture returns 0 after successfully recording a failed command; use `--mirror-exit-code` to preserve its status.
 
 Requirements: Kujo 1.8.1 or newer with `write_file_atomic` and `path_is_symlink` support, Git, and POSIX utilities (`mkdir`, `date`, `head`, `rm`, `uname`). Python 3 is only used for tests and measurements. No package installation or network access is required by CaseFile itself. Tool version probes run installed executables from PATH, which must be trusted.
 
