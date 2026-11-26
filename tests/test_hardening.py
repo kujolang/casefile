@@ -127,6 +127,35 @@ class Hardening(unittest.TestCase):
         self.assertTrue(data['logs']['truncated'])
         self.assertEqual((Path(data['case']['path']) / 'combined.log').stat().st_size, 64)
 
+    def test_invalid_log_preflight_preserves_completed_forced_case(self):
+        self.fixed_date()
+        existing = self.capture('--manual')
+        manifest = Path(existing['case']['path']) / 'case.json'
+        original = manifest.read_bytes()
+        result = self.run_cli('capture', '--name', 'fixture', '--from-log', str(self.ws), '--force')
+        self.assertEqual(result.returncode, 4)
+        self.assertIn('regular file', result.stdout)
+        self.assertEqual(manifest.read_bytes(), original)
+
+    def test_empty_budget_import_skips_external_reader(self):
+        log = self.ws / 'input.log'
+        log.write_text('the caller asked to discard this')
+        helper = self.bin / 'head'
+        helper.write_text('#!/bin/sh\nexit 99\n')
+        helper.chmod(0o755)
+        data = self.capture('--from-log', str(log), '--max-log-bytes', '0')
+        self.assertTrue(data['logs']['truncated'])
+        self.assertEqual((Path(data['case']['path']) / 'combined.log').read_text(), '')
+
+    def test_invalid_date_output_uses_runtime_timestamp(self):
+        helper = self.bin / 'date'
+        helper.write_text('#!/bin/sh\nprintf "invalid fixture date\\n"\n')
+        helper.chmod(0o755)
+        data = self.capture('--manual')
+        self.assertRegex(data['case']['id'], r'^[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{6}-fixture$')
+        self.assertFalse(data['case']['id'].startswith('1970-'))
+        self.assertEqual(self.run_cli('show', 'latest', '--format', 'json').returncode, 0)
+
     def test_zero_log_limit_still_executes_command(self):
         data = self.capture('--max-log-bytes', '0', '--', 'sh', '-c', 'printf hello; exit 7')
         self.assertEqual(data['command']['exit_code'], 7)

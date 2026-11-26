@@ -592,19 +592,13 @@ func require_writes(file_pairs) {
 }
 
 func now_case_stamp() {
-	probe := safe_spawn(["date", "+%Y-%m-%d-%H%M%S"])
+	probe := safe_spawn_with_options(["date", "+%Y-%m-%d-%H%M%S"], {"timeout_ms": 2000, "max_output_bytes": 128})
 	if proc_success(probe) && proc_exitcode(probe) == 0 {
-		return trim(proc_stdout(probe))
+		stamp := trim(proc_stdout(probe))
+		if regex_match(stamp, "^[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{6}$") { return stamp }
 	}
-	fallback := current_timestamp()
-	fallback = replace(fallback, "T", "-")
-	fallback = replace(fallback, ":", "")
-	fallback = replace(fallback, "+", "-")
-	fallback = replace(fallback, "Z", "")
-	if len(fallback) >= 17 {
-		return substring(fallback, 0, 17)
-	}
-	return "1970-01-01-000000"
+	utc := now_utc()
+	return substring(utc, 0, 10) + "-" + replace(substring(utc, 11, 19), ":", "")
 }
 
 func sanitize_case_name(name_value) {
@@ -1272,22 +1266,28 @@ func capture_command(case_path, options, redact_enabled, patterns) {
 	}
 }
 
+func validate_log_source(log_path) {
+	if !is_truthy(path_exists(log_path)) { return {"ok": false, "error": "log file not found: " + log_path} }
+	if !is_truthy(path_is_file(log_path)) { return {"ok": false, "error": "log input must be a regular file: " + log_path} }
+	return {"ok": true}
+}
+
 func capture_from_log(case_path, log_path, redact_enabled, patterns, max_log_bytes) {
-	if !is_truthy(file_exists(log_path)) {
-		return {"ok": false, "error": "log file not found: " + log_path}
-	}
+	source := validate_log_source(log_path)
+	if !source["ok"] { return source }
 
 	try {
 		size := file_size(log_path)
-		limit := max_log_bytes
-		if limit == 0 {
-			limit = 1
+		raw_log := ""
+		truncated := size > max_log_bytes
+		if max_log_bytes > 0 {
+			read_result := safe_spawn_with_options(["head", "-c", to_string(max_log_bytes), utility_path(path_absolute(log_path))], {"max_output_bytes": max_log_bytes})
+			if proc_exitcode(read_result) != 0 {
+				return {"ok": false, "error": "failed to read log file: " + proc_stderr(read_result)}
+			}
+			raw_log = proc_stdout(read_result)
+			truncated = truncated || is_truthy(proc_stdout_truncated(read_result))
 		}
-		read_result := safe_spawn_with_options(["head", "-c", to_string(max_log_bytes), utility_path(path_absolute(log_path))], {"max_output_bytes": limit})
-		if proc_exitcode(read_result) != 0 {
-			return {"ok": false, "error": "failed to read log file: " + proc_stderr(read_result)}
-		}
-		raw_log := proc_stdout(read_result)
 		redacted := redact_text(raw_log, redact_enabled, patterns)
 		display_redacted := redact_text("<from-log> " + log_path, redact_enabled, patterns)
 		write_result := require_writes([
@@ -1309,7 +1309,7 @@ func capture_from_log(case_path, log_path, redact_enabled, patterns, max_log_byt
 			"stdout": "",
 			"stderr": "",
 			"combined": redacted["text"],
-			"truncated": (size > max_log_bytes || proc_stdout_truncated(read_result)),
+			"truncated": truncated,
 			"timed_out": false,
 			"success": true,
 			"redaction_enabled": redact_enabled,
@@ -1705,6 +1705,13 @@ func capture_command_handler(subargs) {
 		exit(parsed_result["code"])
 	}
 	options := parsed_result["options"]
+	if options["mode"] == "log" {
+		source := validate_log_source(options["from_log"])
+		if !source["ok"] {
+			print_capture_error(source["error"])
+			exit(4)
+		}
+	}
 
 	if options["output_dir"] != null {
 		cfg["output_dir"] = options["output_dir"]
